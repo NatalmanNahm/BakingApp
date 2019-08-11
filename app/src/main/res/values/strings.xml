@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">BackingApp</string>
+
+    //String for recipes
+    <string name="name_recipe">Name:</string>
+    <string name="servings">Servings:</string>
+    <string name="error_message">An error has occurred, please try again</string>
 </resources>
