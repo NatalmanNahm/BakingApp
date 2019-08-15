@@ -1,4 +1,4 @@
-package com.example.backingapp;
+package com.example.backingapp.Adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.backingapp.Model.Recipe;
-import com.squareup.picasso.Picasso;
+import com.example.backingapp.R;
 
 import java.util.ArrayList;
 
@@ -30,7 +30,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
      * The interface that receives onClick messages.
      */
     public interface RecipeAdapterOnClickHandler{
-        void onCLick(int id);
+        void onCLick(int id, String name);
     }
 
     public RecipeAdapter(Context context, ArrayList<Recipe> recipes,
@@ -97,7 +97,8 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             Recipe recipe = mRecipe.get(adapterPosition);
 
             int id = recipe.getmId();
-            mClickHandler.onCLick(id);
+            String name = recipe.getmName();
+            mClickHandler.onCLick(id, name);
 
         }
     }

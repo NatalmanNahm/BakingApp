@@ -3,6 +3,7 @@ package com.example.backingapp.JsonUtils;
 import android.net.Uri;
 import android.util.Log;
 
+import com.example.backingapp.Model.MenuRecipes;
 import com.example.backingapp.Model.Recipe;
 
 import java.io.BufferedReader;
@@ -148,6 +149,29 @@ public class NetworkUtils {
         ArrayList<Recipe> recipes = JsonUtils.extractRecipeFromJson(jsonREsponse);
 
         return recipes;
+    }
+
+    /**
+     * Query the data and return a list of MenuRecipe Data
+     * @return
+     */
+    public static ArrayList<MenuRecipes> fetchMenuRecipeData(int id){
+        //Create a Url Object
+        URL url = buldUrl();
+
+        //Perform HTTP request to the url and return JSON response back
+        String jsonREsponse = null;
+
+        try {
+            jsonREsponse = getResponseFromHttpUrl(url);
+
+        }catch (IOException e) {
+            Log.e(TAG, "Problem making the HTTP request.", e);
+        }
+
+        //Extract data needed from the json response
+        ArrayList<MenuRecipes> menuRecipes = JsonUtils.extractMenuRecipeJson(jsonREsponse, id);
+        return menuRecipes;
     }
 
 }

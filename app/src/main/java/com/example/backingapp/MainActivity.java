@@ -1,23 +1,25 @@
 package com.example.backingapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Parcelable;
-import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.backingapp.Adapters.RecipeAdapter;
+import com.example.backingapp.Fragments.MenuRecipesFragment;
 import com.example.backingapp.JsonUtils.NetworkUtils;
 import com.example.backingapp.Model.Recipe;
 
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements RecipeAdapter.RecipeAdapterOnClickHandler{
@@ -76,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
      * helper method to Load data we get from Json data
      */
     private void loadRecipeData() {
-        showMovieDataView();
+        showRecipeDataView();
         new Fetchrecipes().execute();
 
     }
@@ -85,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
      * helper method to hide the error message
      * and show Recipes data when it is available
      */
-    private void showMovieDataView() {
+    private void showRecipeDataView() {
         /* First, make sure the error is invisible */
         mErrorMessage.setVisibility(View.INVISIBLE);
         /* Then, make sure the Recipes data is visible */
@@ -123,8 +125,8 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
             //Hiding the progress bar
             mLoading.setVisibility(View.INVISIBLE);
             if (recipes != null && !recipes.isEmpty()){
-                //Displaying the movie image to the user
-                showMovieDataView();
+                //Displaying the Recipe Card
+                showRecipeDataView();
                 mRecipeAdapter.setRecipeData(recipes);
                 mGridLayoutManager.onRestoreInstanceState(mSavedGridLayoutManager);
             }else {
@@ -134,15 +136,24 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
     }
 
     @Override
-    protected void onPostResume() {
-        super.onPostResume();
+    protected void onResume() {
+        super.onResume();
 
         loadRecipeData();
     }
 
     @Override
-    public void onCLick(int id) {
+    public void onCLick(int id, String  name) {
+        Context context = this;
+        Class destinationClass = MenuActivity.class;
 
+        //Creating Intent
+        Intent intent =  new Intent(context, destinationClass);
+        //Parsing id to the MenuActivity
+        intent.putExtra("id", id);
+        intent.putExtra("name", name);
+
+        startActivity(intent);
     }
 
     /**
