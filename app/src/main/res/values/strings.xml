@@ -10,6 +10,10 @@
     <string name="ingredient_label">Ingredients for</string>
     <string name="step_number">Step</string>
 
+    //String for Ingredients
+    <string name="ingredient_measure">Measure:</string>
+    <string name="ingredient_quantity">Quantity:</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

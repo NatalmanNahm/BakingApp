@@ -4,6 +4,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.example.backingapp.ImageIdGenerator;
+import com.example.backingapp.Model.Ingredient;
 import com.example.backingapp.Model.MenuRecipes;
 import com.example.backingapp.Model.Recipe;
 import com.example.backingapp.R;
@@ -59,12 +60,18 @@ public class JsonUtils {
 
         } catch (JSONException e) {
             //If there is a problem parsing the Json object print this message
-            Log.e(TAG, "Error parsing the Movie Json object");
+            Log.e(TAG, "Error parsing the Recipes Json object");
         }
         //return a list of Recipe Data
         return recipes;
     }
 
+    /**
+     * Extracting data needed from json file to populate the MenuFragment
+     * @param json
+     * @param recipeId
+     * @return
+     */
     public static ArrayList<MenuRecipes> extractMenuRecipeJson(String json, int recipeId){
         //If the string Json is empty the return early
         if (TextUtils.isEmpty(json)){
@@ -94,13 +101,15 @@ public class JsonUtils {
                     JSONArray steps = jsonObject.getJSONArray("steps");
 
                     for (int e = 0; e<steps.length(); e++){
-                        JSONObject stepsobject = steps.getJSONObject(e);
+                        JSONObject stepsObject = steps.getJSONObject(e);
 
-                        stepId = stepsobject.getInt("id");
-                        stepName = stepsobject.getString("shortDescription");
+                        stepId = stepsObject.getInt("id");
+                        stepName = stepsObject.getString("shortDescription");
+                        String stepDesc = stepsObject.getString("description");
+                        String stepVideo = stepsObject.getString("videoURL");
 
                         String stepNumber = "Step " + (stepId + 1);
-                        menuRecipes.add(new MenuRecipes(stepId, stepName, stepNumber));
+                        menuRecipes.add(new MenuRecipes(stepId, stepName, stepNumber, stepDesc, stepVideo));
                     }
                 }
 
@@ -108,10 +117,56 @@ public class JsonUtils {
 
         } catch (JSONException e) {
             //If there is a problem parsing the Json object print this message
-            Log.e(TAG, "Error parsing the Movie Json object");
+            Log.e(TAG, "Error parsing the Recipes Json object");
         }
         //Return list of Menu Recipes
         return menuRecipes;
+    }
+
+    public static ArrayList<Ingredient> extractIngredientsJson(String json, int recipeId){
+        //If the string Json is empty the return early
+        if (TextUtils.isEmpty(json)){
+            return null;
+        }
+
+        //Creating an Empty ArrayList of Ingredients
+        ArrayList<Ingredient> ingredients = new ArrayList<>();
+
+        //Try to parse the Json and if the is a problem the JSONException will be Thrown.
+        //It will be then catch in the catch block, so the app doesn't crash
+
+        try {
+            //Build Recipe data with the data correspondent to what we need
+            JSONArray rootJson = new JSONArray(json);
+
+            //Iterate through the array to get the data we want
+            for (int i = 0; i<rootJson.length(); i++){
+
+                JSONObject jsonObject = rootJson.getJSONObject(i);
+
+                int id = jsonObject.getInt("id");
+
+                if (recipeId == id){
+                    JSONArray ingreJson = jsonObject.getJSONArray("ingredients");
+
+                    for (int e = 0; e<ingreJson.length(); e++){
+
+                        JSONObject ingredientsObject = ingreJson.getJSONObject(e);
+
+                        String quantity = ingredientsObject.getString("quantity");
+                        String measure = ingredientsObject.getString("measure");
+                        String ingredient = ingredientsObject.getString("ingredient");
+
+                        ingredients.add(new Ingredient(id, ingredient, quantity, measure));
+                    }
+                }
+
+            }
+        } catch (JSONException e) {
+            //If there is a problem parsing the Json object print this message
+            Log.e(TAG, "Error parsing the Recipes Json object");
+        }
+        return ingredients;
     }
 
 }

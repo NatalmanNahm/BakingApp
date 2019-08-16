@@ -1,10 +1,13 @@
 package com.example.backingapp.Fragments;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.view.menu.MenuAdapter;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,6 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.backingapp.Adapters.MenuRecipeAdapter;
+import com.example.backingapp.BakingActivity;
 import com.example.backingapp.JsonUtils.NetworkUtils;
 import com.example.backingapp.MainActivity;
 import com.example.backingapp.MenuActivity;
@@ -30,7 +34,7 @@ import java.util.ArrayList;
  * A simple {@link Fragment} subclass.
  * create an instance of this fragment.
  */
-public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.MenuAdapterOnCLickHandler {
+public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.MenuAdapterOnCLickHandler, View.OnClickListener {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -46,31 +50,53 @@ public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.M
     private View rootView;
 
 
+    //Define a new interface OnButtonClickListener that triggers a callback in the host activity
+    OnButtonClickListener mCallBack;
 
-//    public static MenuRecipesFragment newInstance(int param1, String param2) {
-//        MenuRecipesFragment fragment = new MenuRecipesFragment();
-//        Bundle args = new Bundle();
-//        args.putInt(ARG_PARAM1, param1);
-//        args.putString(ARG_PARAM2, param2);
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
-//
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        if (getArguments() != null) {
-//            mRecipeId = getArguments().getInt(ARG_PARAM1);
-//            mRecipeName = getArguments().getString(ARG_PARAM2);
-//            Log.d("RECIPE", Integer.toString(mRecipeId));
-//
-//        }
-//    }
+    @Override
+    public void onClick(View v) {
+
+        //Create a bundle to be used to parse the id to the Ingredients Fragment
+        Bundle bundle = new Bundle();
+        bundle.putInt("id", mRecipeId);
+
+        //Attach bundle to an intent
+        final Intent ingredientIntent = new Intent(getContext(), BakingActivity.class);
+        ingredientIntent.putExtras(bundle);
+
+        startActivity(ingredientIntent);
+    }
+
+    //OnButtonClickListener interface, calls a method in the  host activity named OnButtonClickListener
+    public interface OnButtonClickListener{
+        void onButtonClick();
+    }
+
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        //This is to make sure that the host activity implements the interface
+        //Otherwise, It throws an exception
+        try {
+            mCallBack = (OnButtonClickListener) context;
+        }catch (ClassCastException e){
+            throw new ClassCastException(context.toString() + "must Implement OnButtonClickListener");
+        }
+    }
 
     public MenuRecipesFragment() {
         // Required empty public constructor
     }
 
+    /**
+     * Inflate layout with data we get back from the async task
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -82,8 +108,6 @@ public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.M
 
         // Inflate the layout for this fragment
         rootView =  inflater.inflate(R.layout.fragment_menu_recipes, container, false);
-
-        Log.d("RECIPE", Integer.toString(mRecipeId));
 
 
         //Getting reference of the recyclerView so we can set adapter to it
@@ -106,6 +130,9 @@ public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.M
         mRecyclerView.setAdapter(mMenuAdapter);
 
         new FetchMenuRecipeTask().execute();
+
+        mIngredientButton = rootView.findViewById(R.id.ingredients_button);
+        mIngredientButton.setOnClickListener(this);
 
         //Return RootView
         return rootView;
