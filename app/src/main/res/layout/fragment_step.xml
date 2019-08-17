@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="12dp"
+    tools:context=".Fragments.StepFragment">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/step_desc"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:layout_marginLeft="4dp"/>
+
+    <TextView
+        android:id="@+id/step_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="3. Press the cookie crumb mixture into the prepared pie pan and bake for 12 minutes. Let crust cool to room temperature."
+        android:textSize="18sp"
+        android:layout_marginLeft="4dp"/>
+
+</LinearLayout>

@@ -50,8 +50,6 @@ public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.M
     private View rootView;
 
 
-    //Define a new interface OnButtonClickListener that triggers a callback in the host activity
-    OnButtonClickListener mCallBack;
 
     @Override
     public void onClick(View v) {
@@ -67,24 +65,6 @@ public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.M
         startActivity(ingredientIntent);
     }
 
-    //OnButtonClickListener interface, calls a method in the  host activity named OnButtonClickListener
-    public interface OnButtonClickListener{
-        void onButtonClick();
-    }
-
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        //This is to make sure that the host activity implements the interface
-        //Otherwise, It throws an exception
-        try {
-            mCallBack = (OnButtonClickListener) context;
-        }catch (ClassCastException e){
-            throw new ClassCastException(context.toString() + "must Implement OnButtonClickListener");
-        }
-    }
 
     public MenuRecipesFragment() {
         // Required empty public constructor
@@ -196,7 +176,19 @@ public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.M
     }
 
     @Override
-    public void onClick(int id) {
+    public void onClick(int id, String description, String videoLink) {
+
+        //Getting Context and Targeted Activity
+        Context context = getContext();
+        Class destinationClass = BakingActivity.class;
+
+        //Creating Intent and attach it to an Activity
+        Intent intent =  new Intent(context, destinationClass);
+
+        //parsing description and VideoLink to The Activity
+        intent.putExtra("desc", description);
+        intent.putExtra("video", videoLink);
+        startActivity(intent);
 
     }
 

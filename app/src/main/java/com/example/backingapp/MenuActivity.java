@@ -8,7 +8,7 @@ import android.widget.Button;
 
 import com.example.backingapp.Fragments.MenuRecipesFragment;
 
-public class MenuActivity extends AppCompatActivity implements MenuRecipesFragment.OnButtonClickListener{
+public class MenuActivity extends AppCompatActivity{
 
     //Initializer
     private int mId;
@@ -41,12 +41,6 @@ public class MenuActivity extends AppCompatActivity implements MenuRecipesFragme
             }
 
         }
-
-    }
-
-    //Define the behavior for onButtonClick
-    @Override
-    public void onButtonClick(){
 
     }
 

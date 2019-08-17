@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
     }
 
     @Override
-    public void onCLick(int id, String  name) {
+    public void onCLick(int id, String name) {
         Context context = this;
         Class destinationClass = MenuActivity.class;
 
