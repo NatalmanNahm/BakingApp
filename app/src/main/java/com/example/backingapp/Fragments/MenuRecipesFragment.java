@@ -182,12 +182,34 @@ public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.M
         Context context = getContext();
         Class destinationClass = BakingActivity.class;
 
+        //Initialize all array to parse to the Baking Activity
+        int[] idArray = new int[mMenuRecipe.size()];
+        String[] descArray = new String[mMenuRecipe.size()];
+        String[] linkArray = new String[mMenuRecipe.size()];
+
+        //Iterate through the ArrayList and put their respective data
+        //in their Array
+        for (int i = 0; i<mMenuRecipe.size(); i++){
+            MenuRecipes menuRecipes = mMenuRecipe.get(i);
+
+            idArray[i] = menuRecipes.getmStepId();
+            descArray[i] = menuRecipes.getmStepDesc();
+            linkArray[i] = menuRecipes.getmVideoUrl();
+
+        }
+        //Creating a bundle that to be used to send data to the Baking activity
+        Bundle bundle = new Bundle();
+        bundle.putInt("StepId", id);
+        bundle.putString("desc", description);
+        bundle.putString("video", videoLink);
+        bundle.putIntArray("idArray", idArray);
+        bundle.putStringArray("descArray", descArray);
+        bundle.putStringArray("linkArray", linkArray);
+
         //Creating Intent and attach it to an Activity
         Intent intent =  new Intent(context, destinationClass);
-
-        //parsing description and VideoLink to The Activity
-        intent.putExtra("desc", description);
-        intent.putExtra("video", videoLink);
+        //parsing all data to the activity
+        intent.putExtras(bundle);
         startActivity(intent);
 
     }
