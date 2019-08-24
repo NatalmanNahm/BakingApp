@@ -1,7 +1,11 @@
 package com.example.backingapp;
 
+import android.appwidget.AppWidgetManager;
+import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
@@ -19,6 +23,9 @@ import com.example.backingapp.Adapters.RecipeAdapter;
 import com.example.backingapp.Fragments.MenuRecipesFragment;
 import com.example.backingapp.JsonUtils.NetworkUtils;
 import com.example.backingapp.Model.Recipe;
+import com.example.backingapp.widget.BackingWidget;
+import com.example.backingapp.widget.GridwidgetService;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
@@ -34,9 +41,11 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
     private Parcelable mSavedGridLayoutManager;
 
     private static String KEY_INSTANCE_SAVED_POSITION = "recipe_position";
+    public static final String PREF_NAME = "ArrayListRecipe";
 
     private TextView mErrorMessage;
     private ProgressBar mLoading;
+    private ServiceConnection mServiceConn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,9 +62,15 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
         mLoading = (ProgressBar) findViewById(R.id.loading_circle);
 
         //Creating gridView where we add the recipes
-        mGridLayoutManager =
-                new GridLayoutManager(this, calculateNoOfColumns(this),
-                        GridLayoutManager.VERTICAL, false);
+        if (findViewById(R.id.main_sw600) != null){
+            mGridLayoutManager =
+                    new GridLayoutManager(this, calculateNoOfColumnsLandscape(this),
+                            GridLayoutManager.VERTICAL, false);
+        } else {
+            mGridLayoutManager =
+                    new GridLayoutManager(this, calculateNoOfColumns(this),
+                            GridLayoutManager.VERTICAL, false);
+        }
 
         //Set GridView to the Reyclerview
         mRecyclerView.setLayoutManager(mGridLayoutManager);
@@ -70,6 +85,13 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
             mSavedGridLayoutManager = savedInstanceState.getParcelable(KEY_INSTANCE_SAVED_POSITION);
             mGridLayoutManager.onRestoreInstanceState(mSavedGridLayoutManager);
         }
+
+        //Sending Arraylist of mRecipe
+        Intent intent = new Intent(this, BackingWidget.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        intent.putParcelableArrayListExtra("ArrayList", mRecipes);
+        sendBroadcast(intent);
+
         loadRecipeData();
 
     }
@@ -172,6 +194,20 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
 
         return noOfColumns;
     }
+
+    public static int calculateNoOfColumnsLandscape(Context context) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        int scalingFactor = 200;
+        int noOfColumns = (int) (dpWidth / scalingFactor);
+        if(noOfColumns < 2){
+            noOfColumns = 2;
+        }
+
+        return noOfColumns;
+    }
+
+
 
     /**
      * getting back to where we left overriding the onSaveInstanceState

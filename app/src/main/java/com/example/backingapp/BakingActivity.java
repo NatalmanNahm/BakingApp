@@ -1,12 +1,15 @@
 package com.example.backingapp;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import com.example.backingapp.Fragments.IngredientFragment;
@@ -25,6 +28,9 @@ public class BakingActivity extends AppCompatActivity {
     private RelativeLayout mRelativeLayout;
     FloatingActionButton nextButton;
     FloatingActionButton previousButton;
+    Toolbar mToolbar;
+    private FrameLayout mFramelayou1;
+    private FrameLayout mFramelayout2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,9 +45,29 @@ public class BakingActivity extends AppCompatActivity {
         mRelativeLayout = (RelativeLayout) findViewById(R.id.relativeLayout);
         previousButton = (FloatingActionButton) findViewById(R.id.previous_Button);
         nextButton = (FloatingActionButton) findViewById(R.id.nextButton);
+        mToolbar = (Toolbar) findViewById(R.id.baking_toolbar);
+        mFramelayou1 = (FrameLayout) findViewById(R.id.frameLayout1);
+        mFramelayout2 = (FrameLayout) findViewById(R.id.frameLayout2);
 
         //Create Intent
         Intent intent = getIntent();
+        getSupportActionBar().hide();
+
+        //Create Ingredients when the widget is clicked
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            int id = extras.getInt("WidRecipeId");
+            ingredientFragment.setmRecipeId(id);
+
+            Log.d("WIDGET", Integer.toString(id));
+
+            mRelativeLayout.setVisibility(View.GONE);
+            mFramelayou1.setVisibility(View.VISIBLE);
+            mFramelayout2.setVisibility(View.GONE);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frameLayout1, ingredientFragment)
+                    .commit();
+        }
 
         //Getting values parsed by the main activity
         if (intent != null) {
@@ -51,6 +77,8 @@ public class BakingActivity extends AppCompatActivity {
 
                 mRelativeLayout.setVisibility(View.GONE);
 
+                mFramelayou1.setVisibility(View.VISIBLE);
+                mFramelayout2.setVisibility(View.GONE);
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.frameLayout1, ingredientFragment)
                         .commit();
@@ -64,22 +92,33 @@ public class BakingActivity extends AppCompatActivity {
                 mDescArray = intent.getStringArrayExtra("descArray");
                 mLinkArray = intent.getStringArrayExtra("linkArray");
 
-                mRelativeLayout.setVisibility(View.VISIBLE);
+                //Landscape setting
+                if (findViewById(R.id.landscape) != null){
+                    displayOnLandscape(stepFragment, videoFragment);
 
-                //change to next Video if there is one
-                if (mVideoLink != null && !mVideoLink.isEmpty()){
-                    startVideoFragment(videoFragment, mVideoLink);
                 }
-
-                //change to next description
-                startDescFragment(stepFragment, mDescription);
+                //Portrait Setting
+                else {
+                    dissplayOnPotrait(stepFragment, videoFragment);
+                }
 
                 hideNextButton(mId);
                 hidePreviousButton(mId);
 
+
             }
 
         }
+    }
+
+
+    public static Intent createLaunchIngredientFragment(Context context, int recipeId){
+
+        Intent intent = new Intent(context, BakingActivity.class);
+        IngredientFragment ingredientFragment = new IngredientFragment();
+        ingredientFragment.setmRecipeId(recipeId);
+
+        return intent;
     }
 
     /**
@@ -101,23 +140,22 @@ public class BakingActivity extends AppCompatActivity {
                 mVideoLink = mLinkArray[next];
                 mDescription = mDescArray[next];
 
-                //change to next Video if there is one
-                if (mVideoLink != null && !mVideoLink.isEmpty()){
-                    startVideoFragment(videoFragment, mVideoLink);
-                } else {
-                    getSupportFragmentManager().beginTransaction()
-                            .detach(getSupportFragmentManager().findFragmentById(R.id.frameLayout1))
-                            .commit();
-                }
-
-                //change to next description
-                startDescFragment(stepFragment, mDescription);
-
-                hideNextButton(mId);
-                hidePreviousButton(mId);
-
+                break;
             }
         }
+
+        //Landscape setting
+        if (findViewById(R.id.landscape) != null){
+            displayOnLandscape(stepFragment, videoFragment);
+
+        }
+        //Portrait Setting
+        else {
+           dissplayOnPotrait(stepFragment, videoFragment);
+        }
+
+        hideNextButton(mId);
+        hidePreviousButton(mId);
     }
 
     /**
@@ -144,23 +182,23 @@ public class BakingActivity extends AppCompatActivity {
                 mVideoLink = mLinkArray[previous];
                 mDescription = mDescArray[previous];
 
-                //change to next Video if there is one
-                if (mVideoLink != null && !mVideoLink.isEmpty()){
-                    startVideoFragment(videoFragment, mVideoLink);
-                } else {
-                    getSupportFragmentManager().beginTransaction()
-                            .detach(getSupportFragmentManager().findFragmentById(R.id.frameLayout1))
-                            .commit();
-                }
-
-                //change to next description
-                startDescFragment(stepFragment, mDescription);
-
-                hideNextButton(mId);
-                hidePreviousButton(mId);
+                break;
 
             }
         }
+
+        //Landscape setting
+        if (findViewById(R.id.landscape) != null){
+            displayOnLandscape(stepFragment, videoFragment);
+
+        }
+        //Portrait Setting
+        else {
+            dissplayOnPotrait(stepFragment, videoFragment);
+        }
+
+        hideNextButton(mId);
+        hidePreviousButton(mId);
     }
 
     /**
@@ -213,5 +251,51 @@ public class BakingActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Helper method to display data on a landscape setting
+     * @param stepFragment
+     * @param videoFragment
+     */
+    private void displayOnLandscape(StepFragment stepFragment, VideoFragment videoFragment){
+        //Hide toolbar
+        mToolbar.setVisibility(View.GONE);
+        //hide the Next and Previous Button too
+        mRelativeLayout.setVisibility(View.GONE);
+        //change to next Video if there is one
+        if (mVideoLink != null && !mVideoLink.isEmpty()){
+            mFramelayou1.setVisibility(View.VISIBLE);
+            startVideoFragment(videoFragment, mVideoLink);
 
+            mFramelayout2.setVisibility(View.GONE);
+
+        } else {
+            mFramelayout2.setVisibility(View.VISIBLE);
+            mFramelayou1.setVisibility(View.GONE);
+            //change to next description
+            startDescFragment(stepFragment, mDescription);
+        }
+    }
+
+    /**
+     * Helper method to display data on a Portrait setting
+     * @param stepFragment
+     * @param videoFragment
+     */
+    private void dissplayOnPotrait(StepFragment stepFragment, VideoFragment videoFragment){
+        //Showing Toolbar
+        mToolbar.setVisibility(View.VISIBLE);
+        //Show the nex and previous button
+        mRelativeLayout.setVisibility(View.VISIBLE);
+        //change to next Video if there is one
+        if (mVideoLink != null && !mVideoLink.isEmpty()){
+            mFramelayou1.setVisibility(View.VISIBLE);
+            startVideoFragment(videoFragment, mVideoLink);
+        } else {
+            mFramelayou1.setVisibility(View.GONE);
+        }
+
+        mFramelayout2.setVisibility(View.VISIBLE);
+        //change to next description
+        startDescFragment(stepFragment, mDescription);
+    }
 }

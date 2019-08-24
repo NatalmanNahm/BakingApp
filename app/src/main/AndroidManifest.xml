@@ -3,11 +3,6 @@
     xmlns:dist="http://schemas.android.com/apk/distribution"
     package="com.example.backingapp">
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-
-    <dist:module dist:instant="true" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -15,7 +10,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".BakingActivity"></activity>
+        <activity android:name=".BakingActivity" />
+
         <activity android:name=".MenuActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
@@ -24,6 +20,23 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <receiver android:name=".widget.BackingWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/backing_widget_info" />
+        </receiver>
+        <service
+            android:name=".widget.GridwidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <dist:module dist:instant="true" />
 
 </manifest>

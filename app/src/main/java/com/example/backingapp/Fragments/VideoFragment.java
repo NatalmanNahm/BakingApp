@@ -1,6 +1,7 @@
 package com.example.backingapp.Fragments;
 
 import android.annotation.SuppressLint;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -8,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.example.backingapp.R;
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -146,6 +148,26 @@ public class VideoFragment extends Fragment {
             playWhenReady = mExoPlayer.getPlayWhenReady();
             mExoPlayer.release();
             mExoPlayer = null;
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        // Checking the orientation of the screen
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            //First Hide other objects (listview or recyclerview), better hide them using Gone.
+            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mPlayerView.getLayoutParams();
+            params.width=params.MATCH_PARENT;
+            params.height=params.MATCH_PARENT;
+            mPlayerView.setLayoutParams(params);
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
+            //unhide your objects here.
+            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mPlayerView.getLayoutParams();
+            params.width=params.MATCH_PARENT;
+            params.height=600;
+            mPlayerView.setLayoutParams(params);
         }
     }
 }

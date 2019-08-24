@@ -45,5 +45,10 @@ dependencies {
     //Implementation of exoPlayer
     implementation 'com.google.android.exoplayer:exoplayer:2.9.6'
 
+    //implementation on support design
     implementation 'com.android.support:design:28.0.0'
+
+    //implementation of Gson
+    implementation 'com.google.code.gson:gson:2.8.5'
+
 }

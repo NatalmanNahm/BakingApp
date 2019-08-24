@@ -14,7 +14,6 @@ public class MenuActivity extends AppCompatActivity{
     private int mId;
     private String mName;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +42,5 @@ public class MenuActivity extends AppCompatActivity{
         }
 
     }
-
 
 }

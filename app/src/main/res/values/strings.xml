@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BackingApp</string>
+    <string name="app_name">Baking Time</string>
 
     //String for recipes
     <string name="name_recipe">Name:</string>
@@ -16,4 +16,9 @@
 
     //String for step
     <string name="step_desc">Description</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+
+    //Ingredients Strings
+    <string name="empty_view_text">There is no Ingredients</string>
 </resources>
