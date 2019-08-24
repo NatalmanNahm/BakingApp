@@ -60,8 +60,8 @@ public class BackingWidget extends AppWidgetProvider {
     private static RemoteViews getGridIndredientRemoteView(Context context){
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_grid_view);
         Intent intent = new Intent(context, GridwidgetService.class);
-        intent.putParcelableArrayListExtra("ArrayList", mRecipes);
-        intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
+//        intent.putParcelableArrayListExtra("ArrayList", mRecipes);
+//        intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
         views.setRemoteAdapter(R.id.widget_grid_view, intent);
 
         Intent appIntent = new Intent(context, BakingActivity.class);
@@ -73,17 +73,17 @@ public class BackingWidget extends AppWidgetProvider {
         return views;
     }
 
-    public static void setRecipes(ArrayList<Recipe> recipes){
-        mRecipes = recipes;
-    }
-
-    @Override
-    public void onReceive(Context context, Intent intent) {
-
-        if (!intent.getParcelableArrayListExtra("ArrayList").isEmpty()){
-            mRecipes = intent.getParcelableArrayListExtra("ArrayList");
-        }
-        super.onReceive(context, intent);
-    }
+//    public static void setRecipes(ArrayList<Recipe> recipes){
+//        mRecipes = recipes;
+//    }
+//
+//    @Override
+//    public void onReceive(Context context, Intent intent) {
+//
+//        if (!intent.getParcelableArrayListExtra("ArrayList").isEmpty()){
+//            mRecipes = intent.getParcelableArrayListExtra("ArrayList");
+//        }
+//        super.onReceive(context, intent);
+//    }
 }
 

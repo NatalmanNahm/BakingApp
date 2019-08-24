@@ -8,6 +8,7 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import com.example.backingapp.ImageIdGenerator;
 import com.example.backingapp.JsonUtils.NetworkUtils;
 import com.example.backingapp.Model.Recipe;
 import com.example.backingapp.R;
@@ -18,7 +19,7 @@ public class GridwidgetService extends RemoteViewsService {
 
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
-        return new GridRemoteViewsFactory(this.getApplicationContext(), intent);
+        return new GridRemoteViewsFactory(this.getApplicationContext());
     }
 
 }
@@ -26,21 +27,18 @@ public class GridwidgetService extends RemoteViewsService {
 class GridRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory{
 
     Context mContext;
-    ArrayList<Recipe> mRecipeArray;
-    public GridRemoteViewsFactory(Context applicationContext, Intent intent) {
+    ArrayList<Recipe> mRecipeArray = new ArrayList<>();
+    public GridRemoteViewsFactory(Context applicationContext) {
         mContext = applicationContext;
-        mRecipeArray = intent.getParcelableArrayListExtra("ArrayList");
-
     }
 
     @Override
     public void onCreate() {
-
     }
 
     @Override
     public void onDataSetChanged() {
-
+        mRecipeArray = NetworkUtils.fetchRecipeData();
     }
 
     @Override
@@ -56,12 +54,14 @@ class GridRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory{
 
     @Override
     public RemoteViews getViewAt(int position) {
-        if (mRecipeArray == null) return null;
+
+        mRecipeArray = NetworkUtils.fetchRecipeData();
+
+        RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.backing_widget);
         Recipe recipe = mRecipeArray.get(position);
         int recipeId = recipe.getmId();
         String name = recipe.getmName();
 
-        RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.backing_widget);
 
         views.setImageViewResource(R.id.widget_icon, R.drawable.cake_widget);
         views.setTextViewText(R.id.widget_Ing_name, name);

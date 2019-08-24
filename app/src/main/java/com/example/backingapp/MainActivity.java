@@ -25,7 +25,6 @@ import com.example.backingapp.JsonUtils.NetworkUtils;
 import com.example.backingapp.Model.Recipe;
 import com.example.backingapp.widget.BackingWidget;
 import com.example.backingapp.widget.GridwidgetService;
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
@@ -86,13 +85,13 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
             mGridLayoutManager.onRestoreInstanceState(mSavedGridLayoutManager);
         }
 
-        //Sending Arraylist of mRecipe
-        Intent intent = new Intent(this, BackingWidget.class);
-        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-        intent.putParcelableArrayListExtra("ArrayList", mRecipes);
-        sendBroadcast(intent);
-
         loadRecipeData();
+
+//        //Sending Arraylist of mRecipe
+//        Intent intent = new Intent(this, BackingWidget.class);
+//        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+//        intent.putParcelableArrayListExtra("ArrayList", mRecipes);
+//        sendBroadcast(intent);
 
     }
 
