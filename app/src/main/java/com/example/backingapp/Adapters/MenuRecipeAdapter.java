@@ -30,7 +30,7 @@ public class MenuRecipeAdapter extends RecyclerView.Adapter<MenuRecipeAdapter.Me
      * The interface that receives onClick messages.
      */
     public interface MenuAdapterOnCLickHandler {
-        void onClick(int id, String desc, String VideoLink);
+        void onClick(int id, String desc, String VideoLink, String thumbnail);
     }
 
     public MenuRecipeAdapter (Context context, ArrayList<MenuRecipes> menuRecipes,
@@ -98,7 +98,8 @@ public class MenuRecipeAdapter extends RecyclerView.Adapter<MenuRecipeAdapter.Me
             int id = menuRecipes.getmStepId();
             String description = menuRecipes.getmStepDesc();
             String videoLink = menuRecipes.getmVideoUrl();
-            mClickHandler.onClick(id, description, videoLink);
+            String thumbnail = menuRecipes.getmThumbnail();
+            mClickHandler.onClick(id, description, videoLink, thumbnail);
 
         }
     }

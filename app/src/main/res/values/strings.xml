@@ -21,4 +21,7 @@
 
     //Ingredients Strings
     <string name="empty_view_text">There is no Ingredients</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

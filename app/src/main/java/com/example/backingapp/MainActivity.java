@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -44,12 +45,16 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
 
     private TextView mErrorMessage;
     private ProgressBar mLoading;
-    private ServiceConnection mServiceConn;
+    private Toolbar mMainToolBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Setting things for actionBar
+        mMainToolBar = (Toolbar) findViewById(R.id.recipe_toolbar);
+        setSupportActionBar(mMainToolBar);
 
         //Getting reference of the recyclerView so we can set adapter to it
         mRecyclerView = (RecyclerView) findViewById(R.id.recipe_recyclerView);

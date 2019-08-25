@@ -11,7 +11,7 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/baking_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="66dp"
         android:background="@color/toolBarColor"
         android:theme="@style/ToolbarTheme"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
@@ -22,6 +22,10 @@
         android:layout_weight="1"
         android:orientation="vertical">
 
+        <ImageView
+            android:id="@+id/justThumb"
+            android:layout_width="match_parent"
+            android:layout_height="350dp"/>
 
         <FrameLayout
             android:id="@+id/frameLayout1"

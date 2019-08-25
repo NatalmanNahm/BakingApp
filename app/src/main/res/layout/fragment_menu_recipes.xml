@@ -7,13 +7,6 @@
     android:orientation="vertical"
     tools:context=".Fragments.MenuRecipesFragment">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/menu_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/toolBarColor"
-        android:theme="@style/ToolbarTheme"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
     <Button
         android:id="@+id/ingredients_button"
         android:layout_width="match_parent"

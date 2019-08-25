@@ -57,6 +57,7 @@ public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.M
         //Create a bundle to be used to parse the id to the Ingredients Fragment
         Bundle bundle = new Bundle();
         bundle.putInt("id", mRecipeId);
+        bundle.putString("RecipeName", mRecipeName);
 
         //Attach bundle to an intent
         final Intent ingredientIntent = new Intent(getContext(), BakingActivity.class);
@@ -176,7 +177,7 @@ public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.M
     }
 
     @Override
-    public void onClick(int id, String description, String videoLink) {
+    public void onClick(int id, String description, String videoLink, String thumbnail) {
 
         //Getting Context and Targeted Activity
         Context context = getContext();
@@ -186,6 +187,7 @@ public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.M
         int[] idArray = new int[mMenuRecipe.size()];
         String[] descArray = new String[mMenuRecipe.size()];
         String[] linkArray = new String[mMenuRecipe.size()];
+        String[] thumbnailArray = new String[mMenuRecipe.size()];
 
         //Iterate through the ArrayList and put their respective data
         //in their Array
@@ -195,6 +197,7 @@ public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.M
             idArray[i] = menuRecipes.getmStepId();
             descArray[i] = menuRecipes.getmStepDesc();
             linkArray[i] = menuRecipes.getmVideoUrl();
+            thumbnailArray[i] = menuRecipes.getmThumbnail();
 
         }
         //Creating a bundle that to be used to send data to the Baking activity
@@ -202,9 +205,13 @@ public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.M
         bundle.putInt("StepId", id);
         bundle.putString("desc", description);
         bundle.putString("video", videoLink);
+        bundle.putString("thumbnail", thumbnail);
+        bundle.putString("RecipeName",mRecipeName);
+        bundle.putInt("idRecipe", mRecipeId);
         bundle.putIntArray("idArray", idArray);
         bundle.putStringArray("descArray", descArray);
         bundle.putStringArray("linkArray", linkArray);
+        bundle.putStringArray("thumbnailArray", thumbnailArray);
 
         //Creating Intent and attach it to an Activity
         Intent intent =  new Intent(context, destinationClass);

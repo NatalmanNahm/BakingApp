@@ -105,11 +105,12 @@ public class JsonUtils {
 
                         stepId = stepsObject.getInt("id");
                         stepName = stepsObject.getString("shortDescription");
+                        String thumbnail = stepsObject.getString("thumbnailURL");
                         String stepDesc = stepsObject.getString("description");
                         String stepVideo = stepsObject.getString("videoURL");
 
                         String stepNumber = "Step " + (stepId + 1);
-                        menuRecipes.add(new MenuRecipes(stepId, stepName, stepNumber, stepDesc, stepVideo));
+                        menuRecipes.add(new MenuRecipes(stepId, stepName, stepNumber, stepDesc, stepVideo, thumbnail));
                     }
                 }
 

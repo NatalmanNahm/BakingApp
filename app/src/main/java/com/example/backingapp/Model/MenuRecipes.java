@@ -15,18 +15,20 @@ public class MenuRecipes implements Parcelable {
     private String mStepName;
     private String mStepDesc;
     private String mVideoUrl;
+    private String mThumbnail;
 
     /**
      * Constructor for the MenuRecipes
      * @param stepName
      * @param stepNumber
      */
-    public MenuRecipes(int stepId, String stepName, String stepNumber, String stepDesc, String videoUrl){
+    public MenuRecipes(int stepId, String stepName, String stepNumber, String stepDesc, String videoUrl, String thumbnail){
         mStepId = stepId;
         mStepName = stepName;
         mStepNumber = stepNumber;
         mStepDesc = stepDesc;
         mVideoUrl = videoUrl;
+        mThumbnail = thumbnail;
     }
 
     //Creating Parcel to be read from
@@ -36,6 +38,7 @@ public class MenuRecipes implements Parcelable {
         mStepNumber = parcel.readString();
         mStepDesc = parcel.readString();
         mVideoUrl = parcel.readString();
+        mThumbnail = parcel.readString();
     }
 
 
@@ -52,6 +55,7 @@ public class MenuRecipes implements Parcelable {
         dest.writeString(mStepNumber);
         dest.writeString(mStepDesc);
         dest.writeString(mVideoUrl);
+        dest.writeString(mThumbnail);
     }
 
     /**
@@ -87,5 +91,9 @@ public class MenuRecipes implements Parcelable {
 
     public String getmVideoUrl() {
         return mVideoUrl;
+    }
+
+    public String getmThumbnail() {
+        return mThumbnail;
     }
 }
