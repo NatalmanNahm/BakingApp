@@ -45,6 +45,10 @@ public class BakingActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_backing);
 
+        if (savedInstanceState == null){
+
+        }
+
         //ToolBar configuration
         mToolbar = (Toolbar) findViewById(R.id.baking_toolbar);
         setSupportActionBar(mToolbar);
@@ -348,5 +352,10 @@ public class BakingActivity extends AppCompatActivity{
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 }

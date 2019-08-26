@@ -5,7 +5,11 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +20,8 @@ import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.LoadControl;
+import com.google.android.exoplayer2.PlaybackParameters;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
@@ -24,13 +30,17 @@ import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
+import static android.support.constraint.Constraints.TAG;
+
 /**
  *
  * Fragment that play Step Video
  */
-public class VideoFragment extends Fragment {
+public class VideoFragment extends Fragment implements Player.EventListener {
     // the fragment initialization parameters
     private static final String ARG_PARAM1 = "param1";
+    private static final String PLAYER_IS_READY_KEY = "Ready to play";
+    private static final String PLAYER_CURRENT_POS_KEY = "Curent Position";
     private String mVideoLink;
     private PlayerView mPlayerView;
     private ExoPlayer mExoPlayer;
@@ -38,6 +48,8 @@ public class VideoFragment extends Fragment {
     private boolean playWhenReady;
     private int currentWindow = 0;
     private int playbackPosition = 0;
+    private MediaSessionCompat mMediaSession;
+    private PlaybackStateCompat.Builder mStateBuilder;
 
     public VideoFragment() {
         // Required empty public constructor
@@ -47,17 +59,21 @@ public class VideoFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        if (savedInstanceState != null){
-            mVideoLink = savedInstanceState.getString(ARG_PARAM1);
-
-        }
+        setRetainInstance(true);
 
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_video, container, false);
 
         mPlayerView = (PlayerView) rootView.findViewById(R.id.video_exo_player);
 
+        if (savedInstanceState != null){
+            mVideoLink = savedInstanceState.getString(ARG_PARAM1);
+            playbackPosition = savedInstanceState.getInt(PLAYER_CURRENT_POS_KEY);
+            playWhenReady = savedInstanceState.getBoolean(PLAYER_IS_READY_KEY);
+        }
 
+        initializePlayer();
+        initMediaSession();
         return rootView;
     }
 
@@ -73,9 +89,25 @@ public class VideoFragment extends Fragment {
 
             Uri uri = Uri.parse(mVideoLink);
             MediaSource mediaSource = buildMediaSource(uri);
+            mPlayerView.hideController();
             mExoPlayer.prepare(mediaSource,true,false);
 
         }
+    }
+    public void initMediaSession (){
+        mExoPlayer.addListener(this);
+
+        mMediaSession = new MediaSessionCompat(getContext(), TAG);
+        mMediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS);
+        mMediaSession.setMediaButtonReceiver(null);
+
+        mStateBuilder = new PlaybackStateCompat.Builder()
+                .setActions(
+                        PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_PLAY_PAUSE
+                );
+        mMediaSession.setPlaybackState(mStateBuilder.build());
+        mMediaSession.setCallback(new MySessionCallback());
+        mMediaSession.setActive(true);
     }
 
     private MediaSource buildMediaSource(Uri uri) {
@@ -93,52 +125,63 @@ public class VideoFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-
-        outState.putString(ARG_PARAM1, mVideoLink);
         super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (Util.SDK_INT > 23) {
-            initializePlayer();
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        hideSystemUi();
-        if ((Util.SDK_INT <= 23 || mExoPlayer == null)) {
-            initializePlayer();
-        }
+        outState.putString(ARG_PARAM1, mVideoLink);
+        outState.putInt(PLAYER_CURRENT_POS_KEY, playbackPosition);
+        outState.putBoolean(PLAYER_IS_READY_KEY, playWhenReady);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        if (Util.SDK_INT <= 23) {
+        if (mExoPlayer != null) {
             releasePlayer();
         }
     }
 
     @Override
     public void onStop() {
+        if (mExoPlayer != null) {
+            releasePlayer();
+        }
         super.onStop();
-        if (Util.SDK_INT > 23) {
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mExoPlayer != null) {
+            releasePlayer();
+        }
+    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mExoPlayer != null){
             releasePlayer();
         }
     }
 
-    @SuppressLint("InlinedApi")
-    private void hideSystemUi() {
-        mPlayerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
-                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (mExoPlayer != null) {
+            releasePlayer();
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        initializePlayer();
+        initMediaSession();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        initializePlayer();
+        initMediaSession();
     }
 
     private void releasePlayer() {
@@ -151,23 +194,31 @@ public class VideoFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
 
-        // Checking the orientation of the screen
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            //First Hide other objects (listview or recyclerview), better hide them using Gone.
-            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mPlayerView.getLayoutParams();
-            params.width=params.MATCH_PARENT;
-            params.height=params.MATCH_PARENT;
-            mPlayerView.setLayoutParams(params);
-        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
-            //unhide your objects here.
-            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mPlayerView.getLayoutParams();
-            params.width=params.MATCH_PARENT;
-            params.height=600;
-            mPlayerView.setLayoutParams(params);
+    @Override
+    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+        if ((playbackState == Player.STATE_READY) && playWhenReady) {
+            mStateBuilder.setState(PlaybackStateCompat.STATE_PLAYING, playbackPosition, 1f);
+
+        } else if ((playbackState == Player.STATE_READY)){
+            mStateBuilder.setState(PlaybackStateCompat.STATE_PAUSED, playbackPosition, 1f);
+
+        }
+
+        mMediaSession.setPlaybackState(mStateBuilder.build());
+        Log.d("HOVNOOOO", "Playback State Changed");
+    }
+
+    private class MySessionCallback extends MediaSessionCompat.Callback {
+        @Override
+        public void onPlay() {
+            mExoPlayer.setPlayWhenReady(true);
+
+        }
+
+        @Override
+        public void onPause() {
+            mExoPlayer.setPlayWhenReady(false);
         }
     }
 }
