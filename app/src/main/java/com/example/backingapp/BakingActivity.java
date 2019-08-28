@@ -33,32 +33,32 @@ public class BakingActivity extends AppCompatActivity{
     private String[] mLinkArray;
     private String[] mThumbnailArray;
     private RelativeLayout mRelativeLayout;
-    FloatingActionButton nextButton;
-    FloatingActionButton previousButton;
-    Toolbar mToolbar;
+
+    private FloatingActionButton nextButton;
+    private FloatingActionButton previousButton;
+    private Toolbar mToolbar;
+
     private FrameLayout mFramelayou1;
     private FrameLayout mFramelayout2;
     private ImageView mImageView;
+
+    private IngredientFragment mIngredientFragment;
+    private StepFragment mStepFragment;
+    private VideoFragment mVideoFragment;
+
+    private static final String VIDEO_FRAG = "Video Fragment";
+    private static final String INGREDIENT_FRAG = "Ingredient Fragment";
+    private static final String STEP_FRAGMENT = "Step Fragment";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_backing);
 
-        if (savedInstanceState == null){
-
-        }
-
         //ToolBar configuration
         mToolbar = (Toolbar) findViewById(R.id.baking_toolbar);
         setSupportActionBar(mToolbar);
         ActionBar actionBar = getSupportActionBar();
-
-        //Get an instance of the Fragment needed
-        IngredientFragment ingredientFragment = new IngredientFragment();
-        StepFragment stepFragment = new StepFragment();
-        VideoFragment videoFragment = new VideoFragment();
-
 
         mRelativeLayout = (RelativeLayout) findViewById(R.id.relativeLayout);
         previousButton = (FloatingActionButton) findViewById(R.id.previous_Button);
@@ -67,33 +67,41 @@ public class BakingActivity extends AppCompatActivity{
         mFramelayout2 = (FrameLayout) findViewById(R.id.frameLayout2);
         mImageView = (ImageView) findViewById(R.id.justThumb);
 
+        //Get an instance of the Fragment needed
+
+
+//        if (savedInstanceState != null && mIngredientFragment == null) {
+//            mIngredientFragment = (IngredientFragment) getSupportFragmentManager()
+//                    .getFragment(savedInstanceState, INGREDIENT_FRAG);
+//        } else {
+//            mIngredientFragment = new IngredientFragment();
+//        }
+
+//        if (savedInstanceState != null && mStepFragment == null && mVideoFragment == null){
+//            mStepFragment = (StepFragment) getSupportFragmentManager()
+//                    .getFragment(savedInstanceState, STEP_FRAGMENT);
+//            mVideoFragment = (VideoFragment) getSupportFragmentManager()
+//                    .getFragment(savedInstanceState, VIDEO_FRAG);
+//        } else {
+//
+//        }
+
+        mStepFragment = new StepFragment();
+        mVideoFragment = new VideoFragment();
+        mIngredientFragment = new IngredientFragment();
+
+
         //Create Intent
         Intent intent = getIntent();
-
-        //Create Ingredients when the widget is clicked
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            int id = extras.getInt("WidRecipeId");
-            String name = extras.getString("RecipeName");
-            ingredientFragment.setmRecipeId(id);
-
-            mToolbar.setVisibility(View.VISIBLE);
-            mImageView.setVisibility(View.GONE);
-            actionBar.setTitle(name + "Ingredients");
-            mRelativeLayout.setVisibility(View.GONE);
-            mFramelayou1.setVisibility(View.VISIBLE);
-            mFramelayout2.setVisibility(View.GONE);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frameLayout1, ingredientFragment)
-                    .commit();
-        }
 
         //Getting values parsed by the main activity
         if (intent != null) {
             if (intent.hasExtra("id")) {
+
                 mRecipeId = intent.getIntExtra("id", 1);
                 mRecipeName = intent.getStringExtra("RecipeName");
-                ingredientFragment.setmRecipeId(mRecipeId);
+
+                mIngredientFragment.setmRecipeId(mRecipeId);
 
                 mToolbar.setVisibility(View.VISIBLE);
                 mImageView.setVisibility(View.GONE);
@@ -101,9 +109,11 @@ public class BakingActivity extends AppCompatActivity{
                 mRelativeLayout.setVisibility(View.GONE);
                 mFramelayou1.setVisibility(View.VISIBLE);
                 mFramelayout2.setVisibility(View.GONE);
+
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.frameLayout1, ingredientFragment)
+                        .replace(R.id.frameLayout1, mIngredientFragment)
                         .commit();
+
             } else if (intent.hasExtra("desc")){
 
                 //Getting data parse to the activity
@@ -114,6 +124,7 @@ public class BakingActivity extends AppCompatActivity{
                 mDescription = intent.getStringExtra("desc");
                 mVideoLink = intent.getStringExtra("video");
                 mThumbnail = intent.getStringExtra("thumbnail");
+
                 mIdArray = intent.getIntArrayExtra("idArray");
                 mDescArray = intent.getStringArrayExtra("descArray");
                 mLinkArray = intent.getStringArrayExtra("linkArray");
@@ -122,16 +133,15 @@ public class BakingActivity extends AppCompatActivity{
                 actionBar.setTitle(mRecipeName);
                 //Landscape setting
                 if (findViewById(R.id.landscape) != null){
-                    displayOnLandscape(stepFragment, videoFragment);
+                    displayOnLandscape(mStepFragment, mVideoFragment);
                 }
                 //Portrait Setting
                 else {
-                    dissplayOnPotrait(stepFragment, videoFragment);
+                    displayOnPotrait(mStepFragment, mVideoFragment);
                 }
 
                 hideNextButton(mId);
                 hidePreviousButton(mId);
-
 
             }
 
@@ -147,8 +157,8 @@ public class BakingActivity extends AppCompatActivity{
      */
     public void nextStep(View view) {
 
-        VideoFragment videoFragment = new VideoFragment();
-        StepFragment stepFragment = new StepFragment();
+        mVideoFragment = new VideoFragment();
+        mStepFragment = new StepFragment();
         for (int i = 0; i < mIdArray.length-1; i++){
             if (mIdArray[i] == mId){
 
@@ -166,12 +176,12 @@ public class BakingActivity extends AppCompatActivity{
 
         //Landscape setting
         if (findViewById(R.id.landscape) != null){
-            displayOnLandscape(stepFragment, videoFragment);
+            displayOnLandscape(mStepFragment, mVideoFragment);
 
         }
         //Portrait Setting
         else {
-           dissplayOnPotrait(stepFragment, videoFragment);
+           displayOnPotrait(mStepFragment, mVideoFragment);
         }
 
         hideNextButton(mId);
@@ -185,8 +195,8 @@ public class BakingActivity extends AppCompatActivity{
      */
     public void previousStep(View view) {
 
-        VideoFragment videoFragment = new VideoFragment();
-        StepFragment stepFragment = new StepFragment();
+        mVideoFragment = new VideoFragment();
+        mStepFragment = new StepFragment();
         for (int i = 0; i<mIdArray.length; i++){
             if (mIdArray[i] == mId){
 
@@ -210,12 +220,12 @@ public class BakingActivity extends AppCompatActivity{
 
         //Landscape setting
         if (findViewById(R.id.landscape) != null){
-            displayOnLandscape(stepFragment, videoFragment);
+            displayOnLandscape(mStepFragment, mVideoFragment);
 
         }
         //Portrait Setting
         else {
-            dissplayOnPotrait(stepFragment, videoFragment);
+            displayOnPotrait(mStepFragment, mVideoFragment);
         }
 
         hideNextButton(mId);
@@ -302,7 +312,7 @@ public class BakingActivity extends AppCompatActivity{
      * @param stepFragment
      * @param videoFragment
      */
-    private void dissplayOnPotrait(StepFragment stepFragment, VideoFragment videoFragment){
+    private void displayOnPotrait(StepFragment stepFragment, VideoFragment videoFragment){
         //Showing Toolbar
         mToolbar.setVisibility(View.VISIBLE);
         //Show the nex and previous button
@@ -321,7 +331,7 @@ public class BakingActivity extends AppCompatActivity{
                     .placeholder(mImage)
                     .error(mImage)
                     .into(mImageView);
-        }else {
+        } else {
             mFramelayou1.setVisibility(View.GONE);
             mImageView.setVisibility(View.VISIBLE);
             Picasso.get()
@@ -357,5 +367,22 @@ public class BakingActivity extends AppCompatActivity{
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+
+//        if (mVideoFragment.isAdded()){
+//            getSupportFragmentManager().putFragment(outState, VIDEO_FRAG, mVideoFragment);
+//        }
+
+//        if (mIngredientFragment.isAdded()){
+//            getSupportFragmentManager().putFragment(outState, INGREDIENT_FRAG, mIngredientFragment);
+//        }
+
+//        if (mStepFragment.isAdded()){
+//            getSupportFragmentManager().putFragment(outState, STEP_FRAGMENT, mStepFragment);
+//        }
+
+//        getSupportFragmentManager().putFragment(outState, INGREDIENT_FRAG, mIngredientFragment);
+//        getSupportFragmentManager().putFragment(outState, STEP_FRAGMENT, mStepFragment);
+//        getSupportFragmentManager().putFragment(outState, VIDEO_FRAG, mVideoFragment);
+
     }
 }

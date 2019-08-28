@@ -4,7 +4,9 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,6 +35,8 @@ public class IngredientFragment extends Fragment {
     private TextView mErrorMessage;
     private IngredientAdapter mIngredientAdapter;
     private ArrayList<Ingredient> mIngredient;
+    private static final String INGREDIENTS_ARRAYLIST_LIST = "Ingredients";
+    private Parcelable mSavedLinearlayoutLayoutManager;
 
 
     public IngredientFragment() {
@@ -62,6 +66,11 @@ public class IngredientFragment extends Fragment {
         mRecyclerView.setHasFixedSize(true);
         mIngredientAdapter = new IngredientAdapter(getContext(), mIngredient);
         mRecyclerView.setAdapter(mIngredientAdapter);
+
+        if (savedInstanceState != null){
+            mSavedLinearlayoutLayoutManager = savedInstanceState.getParcelable(INGREDIENTS_ARRAYLIST_LIST);
+            mLinearLayoutManager.onRestoreInstanceState(mSavedLinearlayoutLayoutManager);
+        }
 
         new FetchIngredientTask().execute();
 
@@ -103,6 +112,7 @@ public class IngredientFragment extends Fragment {
                 //Show Ingredients
                 showIngredientDataView();
                 mIngredientAdapter.setmIngredient(ingredients);
+                mLinearLayoutManager.onRestoreInstanceState(mSavedLinearlayoutLayoutManager);
             } else {
                 showIngredientErrorMessage();
             }
@@ -116,6 +126,7 @@ public class IngredientFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putInt(ARG_PARAM1, mRecipeId);
+        outState.putParcelable(INGREDIENTS_ARRAYLIST_LIST, mLinearLayoutManager.onSaveInstanceState());
 
         super.onSaveInstanceState(outState);
     }

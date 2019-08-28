@@ -92,12 +92,6 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
 
         loadRecipeData();
 
-//        //Sending Arraylist of mRecipe
-//        Intent intent = new Intent(this, BackingWidget.class);
-//        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-//        intent.putParcelableArrayListExtra("ArrayList", mRecipes);
-//        sendBroadcast(intent);
-
     }
 
     /**

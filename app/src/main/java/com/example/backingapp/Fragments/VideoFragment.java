@@ -47,13 +47,24 @@ public class VideoFragment extends Fragment implements Player.EventListener {
     private View rootView;
     private boolean playWhenReady;
     private int currentWindow = 0;
-    private int playbackPosition = 0;
+    private long playbackPosition = 0;
     private MediaSessionCompat mMediaSession;
     private PlaybackStateCompat.Builder mStateBuilder;
 
     public VideoFragment() {
         // Required empty public constructor
     }
+
+//    @Override
+//    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+//        super.onActivityCreated(savedInstanceState);
+//
+//        if(savedInstanceState != null){
+//            playbackPosition = savedInstanceState.getLong(PLAYER_CURRENT_POS_KEY);
+//            playWhenReady = savedInstanceState.getBoolean(PLAYER_IS_READY_KEY);
+//        }
+//
+//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -68,12 +79,16 @@ public class VideoFragment extends Fragment implements Player.EventListener {
 
         if (savedInstanceState != null){
             mVideoLink = savedInstanceState.getString(ARG_PARAM1);
-            playbackPosition = savedInstanceState.getInt(PLAYER_CURRENT_POS_KEY);
+            playbackPosition = savedInstanceState.getLong(PLAYER_CURRENT_POS_KEY);
             playWhenReady = savedInstanceState.getBoolean(PLAYER_IS_READY_KEY);
+
+            initializePlayer();
+            initMediaSession();
+        }else {
+            initializePlayer();
+            initMediaSession();
         }
 
-        initializePlayer();
-        initMediaSession();
         return rootView;
     }
 
@@ -127,7 +142,9 @@ public class VideoFragment extends Fragment implements Player.EventListener {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(ARG_PARAM1, mVideoLink);
-        outState.putInt(PLAYER_CURRENT_POS_KEY, playbackPosition);
+
+        outState.putLong(PLAYER_CURRENT_POS_KEY, playbackPosition);
+
         outState.putBoolean(PLAYER_IS_READY_KEY, playWhenReady);
     }
 
@@ -135,6 +152,8 @@ public class VideoFragment extends Fragment implements Player.EventListener {
     public void onPause() {
         super.onPause();
         if (mExoPlayer != null) {
+            playbackPosition = mExoPlayer.getCurrentPosition();
+            playWhenReady = mExoPlayer.getPlayWhenReady();
             releasePlayer();
         }
     }
@@ -142,6 +161,8 @@ public class VideoFragment extends Fragment implements Player.EventListener {
     @Override
     public void onStop() {
         if (mExoPlayer != null) {
+            playbackPosition = mExoPlayer.getCurrentPosition();
+            playWhenReady = mExoPlayer.getPlayWhenReady();
             releasePlayer();
         }
         super.onStop();
@@ -151,6 +172,8 @@ public class VideoFragment extends Fragment implements Player.EventListener {
     public void onDestroyView() {
         super.onDestroyView();
         if (mExoPlayer != null) {
+            playbackPosition = mExoPlayer.getCurrentPosition();
+            playWhenReady = mExoPlayer.getPlayWhenReady();
             releasePlayer();
         }
     }
@@ -158,6 +181,8 @@ public class VideoFragment extends Fragment implements Player.EventListener {
     public void onDestroy() {
         super.onDestroy();
         if (mExoPlayer != null){
+            playbackPosition = mExoPlayer.getCurrentPosition();
+            playWhenReady = mExoPlayer.getPlayWhenReady();
             releasePlayer();
         }
     }

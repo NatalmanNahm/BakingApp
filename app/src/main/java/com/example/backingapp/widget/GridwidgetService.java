@@ -67,7 +67,7 @@ class GridRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory{
         views.setTextViewText(R.id.widget_Ing_name, name);
 
         Bundle extras = new Bundle();
-        extras.putInt("WidRecipeId", recipeId);
+        extras.putInt("id", recipeId);
         extras.putString("RecipeName", name);
         Intent fillInIntent = new Intent();
         fillInIntent.putExtras(extras);
