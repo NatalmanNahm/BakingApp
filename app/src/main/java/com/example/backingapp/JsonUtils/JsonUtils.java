@@ -53,8 +53,9 @@ public class JsonUtils {
                 String name = jsonObject.getString("name");
                 int image = ImageIdGenerator.imageId(id);
                 int servings =  jsonObject.getInt("servings");
+                boolean favorite = false;
 
-                recipes.add(new Recipe(id, name, image, servings));
+                recipes.add(new Recipe(id, name, image, servings, favorite));
             }
 
 

@@ -6,39 +6,51 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.widget.RemoteViews;
 
 import com.example.backingapp.BakingActivity;
+import com.example.backingapp.Database.AppDatabase;
 import com.example.backingapp.MainActivity;
 import com.example.backingapp.Model.Recipe;
 import com.example.backingapp.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementation of App Widget functionality.
  */
 public class BackingWidget extends AppWidgetProvider {
 
-    private static ArrayList<Recipe> mRecipes;
+    private static List<Recipe> recipe = new ArrayList<>();
+    private static AppDatabase mDb;
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
+//        mDb = AppDatabase.getInstance(context);
+//
+//        new FetchDataFromDatabase().execute();
 
-        RemoteViews views = getGridIndredientRemoteView(context);
+        RemoteViews  views = getGridIndredientRemoteView(context);
+//        //look in the database to see if there is data
+//        //if there is no data then open MainActivity
+//        if (recipe == null){
+//            views = getCakeRecipesRemoteView(context);
+//        } else { // if there is then open the Ingredient
+//            views = getGridIndredientRemoteView(context);
+//        }
 
-//        // Create an Intent to launch MainActivity when clicked
-//        Intent intent = new Intent(context, BakingActivity.class);
-//        intent.putExtra("WidRecipeId", 2);
-//        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-//        // Construct the RemoteViews object
-//        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.backing_widget);
-//        // Widgets allow click handlers to only launch pending intents
-//        views.setOnClickPendingIntent(R.id.widget_icon, pendingIntent);
+
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         // There may be multiple widgets active, so update all of them
@@ -58,10 +70,9 @@ public class BackingWidget extends AppWidgetProvider {
     }
 
     private static RemoteViews getGridIndredientRemoteView(Context context){
+
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_grid_view);
         Intent intent = new Intent(context, GridwidgetService.class);
-//        intent.putParcelableArrayListExtra("ArrayList", mRecipes);
-//        intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
         views.setRemoteAdapter(R.id.widget_grid_view, intent);
 
         Intent appIntent = new Intent(context, BakingActivity.class);
@@ -73,17 +84,34 @@ public class BackingWidget extends AppWidgetProvider {
         return views;
     }
 
-//    public static void setRecipes(ArrayList<Recipe> recipes){
-//        mRecipes = recipes;
-//    }
-//
-//    @Override
-//    public void onReceive(Context context, Intent intent) {
-//
-//        if (!intent.getParcelableArrayListExtra("ArrayList").isEmpty()){
-//            mRecipes = intent.getParcelableArrayListExtra("ArrayList");
-//        }
-//        super.onReceive(context, intent);
-//    }
+    private  static  RemoteViews getCakeRecipesRemoteView(Context context){
+
+        Intent intent = new Intent(context, MainActivity.class);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        // Construct the RemoteViews object
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.backing_widget);
+        // Widgets allow click handlers to only launch pending intents
+        views.setOnClickPendingIntent(R.id.widget_icon, pendingIntent);
+
+        return views;
+    }
+
+    public static class FetchDataFromDatabase extends AsyncTask<Context, Void, List<Recipe>>{
+
+        @Override
+        protected List<Recipe> doInBackground(Context... contexts) {
+            recipe = null;
+
+            recipe = mDb.recipesDao().GetAllFavRecipe();
+            return recipe;
+        }
+
+        @Override
+        protected void onPostExecute(List<Recipe> recipes) {
+            super.onPostExecute(recipes);
+        }
+    }
+
 }
 

@@ -3,17 +3,17 @@ package com.example.backingapp.widget;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import com.example.backingapp.ImageIdGenerator;
+import com.example.backingapp.Database.AppDatabase;
+import com.example.backingapp.Database.AppExecutors;
 import com.example.backingapp.JsonUtils.NetworkUtils;
 import com.example.backingapp.Model.Recipe;
 import com.example.backingapp.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class GridwidgetService extends RemoteViewsService {
 
@@ -27,18 +27,21 @@ public class GridwidgetService extends RemoteViewsService {
 class GridRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory{
 
     Context mContext;
-    ArrayList<Recipe> mRecipeArray = new ArrayList<>();
+    List<Recipe> mRecipeArray = new ArrayList<>();
+    private AppDatabase mDb;
     public GridRemoteViewsFactory(Context applicationContext) {
         mContext = applicationContext;
     }
 
     @Override
     public void onCreate() {
+
     }
 
     @Override
     public void onDataSetChanged() {
-        mRecipeArray = NetworkUtils.fetchRecipeData();
+        mDb = AppDatabase.getInstance(mContext);
+        mRecipeArray = mDb.recipesDao().GetAllFavRecipe();
     }
 
     @Override
@@ -55,12 +58,10 @@ class GridRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory{
     @Override
     public RemoteViews getViewAt(int position) {
 
-        mRecipeArray = NetworkUtils.fetchRecipeData();
-
         RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.backing_widget);
         Recipe recipe = mRecipeArray.get(position);
-        int recipeId = recipe.getmId();
-        String name = recipe.getmName();
+        int recipeId = recipe.getId();
+        String name = recipe.getName();
 
 
         views.setImageViewResource(R.id.widget_icon, R.drawable.cake_widget);

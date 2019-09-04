@@ -1,33 +1,36 @@
 package com.example.backingapp;
 
-import android.appwidget.AppWidgetManager;
-import android.appwidget.AppWidgetProvider;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Parcelable;
-import android.support.v4.app.Fragment;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
+import android.support.test.espresso.IdlingResource;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.backingapp.Adapters.RecipeAdapter;
-import com.example.backingapp.Fragments.MenuRecipesFragment;
+import com.example.backingapp.Database.AppDatabase;
+import com.example.backingapp.Database.AppExecutors;
+import com.example.backingapp.Database.MainViewModel;
+import com.example.backingapp.IdlingResource.SimpleIdlingResource;
 import com.example.backingapp.JsonUtils.NetworkUtils;
 import com.example.backingapp.Model.Recipe;
-import com.example.backingapp.widget.BackingWidget;
-import com.example.backingapp.widget.GridwidgetService;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements RecipeAdapter.RecipeAdapterOnClickHandler{
 
@@ -35,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
     //Initializer
     private RecyclerView mRecyclerView;
     private RecipeAdapter mRecipeAdapter;
-    private ArrayList<Recipe> mRecipes = new ArrayList<>();
+    private List<Recipe> mRecipes = new ArrayList<>();
 
     private GridLayoutManager mGridLayoutManager;
     private Parcelable mSavedGridLayoutManager;
@@ -46,6 +49,29 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
     private TextView mErrorMessage;
     private ProgressBar mLoading;
     private Toolbar mMainToolBar;
+
+    private boolean isFav;
+    private int mId;
+    private String mName;
+    private int mImage;
+    private int mServings;
+    private AppDatabase mDb;
+
+    private MainViewModel mViewModel;
+
+    // The Idling Resource which will be null in production.
+    @Nullable
+    private SimpleIdlingResource mIdlingResource;
+
+    // ArrayList of Tea objects via the callback.
+    @VisibleForTesting
+    @NonNull
+    public IdlingResource getIdlingResource() {
+        if (mIdlingResource == null) {
+            mIdlingResource = new SimpleIdlingResource();
+        }
+        return mIdlingResource;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,23 +91,28 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
         //creating a progress bar that let the user know that there data is been loaded
         mLoading = (ProgressBar) findViewById(R.id.loading_circle);
 
+        //Getting reference to the ImageButton
+
         //Creating gridView where we add the recipes
         if (findViewById(R.id.main_sw600) != null){
             mGridLayoutManager =
-                    new GridLayoutManager(this, calculateNoOfColumnsLandscape(this),
-                            GridLayoutManager.VERTICAL, false);
+                    new GridLayoutManager(this, 2,
+                            GridLayoutManager.HORIZONTAL, false);
         } else {
             mGridLayoutManager =
                     new GridLayoutManager(this, calculateNoOfColumns(this),
                             GridLayoutManager.VERTICAL, false);
         }
+        //Initialize member variable for the data base
+        mDb = AppDatabase.getInstance(getApplicationContext());
+        mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
 
         //Set GridView to the Reyclerview
         mRecyclerView.setLayoutManager(mGridLayoutManager);
         mRecyclerView.setHasFixedSize(true);
 
         //Create Adapter
-        mRecipeAdapter = new RecipeAdapter(getApplicationContext(), mRecipes,this );
+        mRecipeAdapter = new RecipeAdapter(getApplicationContext(), mRecipes,this);
         //Set Adapter to the RecyclerView
         mRecyclerView.setAdapter(mRecipeAdapter);
 
@@ -98,6 +129,8 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
      * helper method to Load data we get from Json data
      */
     private void loadRecipeData() {
+
+        setUpViewModel();
         showRecipeDataView();
         new Fetchrecipes().execute();
 
@@ -125,7 +158,8 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
         mErrorMessage.setVisibility(View.VISIBLE);
     }
 
-    public class Fetchrecipes extends AsyncTask<String, Void, ArrayList<Recipe>>{
+
+    public class Fetchrecipes extends AsyncTask<String, Void, List<Recipe>>{
 
         @Override
         protected void onPreExecute() {
@@ -134,14 +168,14 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
         }
 
         @Override
-        protected ArrayList<Recipe> doInBackground(String... strings) {
+        protected List<Recipe> doInBackground(String... strings) {
             //Get the Recipes data and populate it to the user
             mRecipes = NetworkUtils.fetchRecipeData();
             return mRecipes;
         }
 
         @Override
-        protected void onPostExecute(ArrayList<Recipe> recipes) {
+        protected void onPostExecute(List<Recipe> recipes) {
             //Hiding the progress bar
             mLoading.setVisibility(View.INVISIBLE);
             if (recipes != null && !recipes.isEmpty()){
@@ -155,6 +189,7 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
         }
     }
 
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -162,8 +197,15 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
         loadRecipeData();
     }
 
+    /**
+     * This is to handle item clciked
+     * whenever the user clicked on an item it opens up
+     * its menu of recipes
+     * @param id
+     * @param name
+     */
     @Override
-    public void onCLick(int id, String name) {
+    public void onCLick(int id, String name, int image, int servings, boolean isFav) {
         Context context = this;
         Class destinationClass = MenuActivity.class;
 
@@ -172,6 +214,9 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
         //Parsing id to the MenuActivity
         intent.putExtra("id", id);
         intent.putExtra("name", name);
+        intent.putExtra("image", image);
+        intent.putExtra("servings", servings);
+        intent.putExtra("isFav", isFav);
 
         startActivity(intent);
     }
@@ -206,7 +251,6 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
     }
 
 
-
     /**
      * getting back to where we left overriding the onSaveInstanceState
      * @param outState
@@ -216,5 +260,19 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
         super.onSaveInstanceState(outState);
         outState.putParcelable(KEY_INSTANCE_SAVED_POSITION, mGridLayoutManager.onSaveInstanceState());
 
+    }
+
+    /**
+     * Getting the data live whenever we get back to the mainActivity
+     */
+    private void setUpViewModel(){
+        MainViewModel mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+
+        mainViewModel.getmRecipe().observe(this, new Observer<List<Recipe>>() {
+            @Override
+            public void onChanged(@Nullable List<Recipe> recipes) {
+                mRecipeAdapter.setRecipeData(mRecipes);
+            }
+        });
     }
 }

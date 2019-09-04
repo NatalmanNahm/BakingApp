@@ -105,7 +105,7 @@ public class BakingActivity extends AppCompatActivity{
 
                 mToolbar.setVisibility(View.VISIBLE);
                 mImageView.setVisibility(View.GONE);
-                actionBar.setTitle(mRecipeName + " Ingredients");
+                actionBar.setTitle(mRecipeName + " " + getString(R.string.ingredients_button_text));
                 mRelativeLayout.setVisibility(View.GONE);
                 mFramelayou1.setVisibility(View.VISIBLE);
                 mFramelayout2.setVisibility(View.GONE);
@@ -130,7 +130,13 @@ public class BakingActivity extends AppCompatActivity{
                 mLinkArray = intent.getStringArrayExtra("linkArray");
                 mThumbnailArray = intent.getStringArrayExtra("thumbnailArray");
 
-                actionBar.setTitle(mRecipeName);
+                if (mId == 0){
+                    actionBar.setTitle(mRecipeName + " " + getString(R.string.step_intro));
+                } else {
+                    actionBar.setTitle(mRecipeName + " " +
+                            getString(R.string.step_title) + " " + (mId + 1));
+                }
+
                 //Landscape setting
                 if (findViewById(R.id.landscape) != null){
                     displayOnLandscape(mStepFragment, mVideoFragment);
