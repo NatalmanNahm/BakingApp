@@ -1,6 +1,7 @@
 package com.example.backingapp;
 
 import android.content.Intent;
+import android.os.PersistableBundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -25,8 +26,11 @@ public class MenuActivity extends AppCompatActivity {
     private int mServings;
     private boolean isFav;
 
+    private static final String MENUFRAGMENT = "Menu Recipe Fragment";
+
     private Toolbar mStepToolbar;
     private boolean isTwoPane;
+    private MenuRecipesFragment mMenuRecipeFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,49 +43,63 @@ public class MenuActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        //Instance of the MenuRecipeFragment
-        MenuRecipesFragment menuRecipesFragment = new MenuRecipesFragment();
+        //Instance of the MenuRecipeFragment or get back what was saved
+        if (savedInstanceState != null){
+            mMenuRecipeFragment = (MenuRecipesFragment) getSupportFragmentManager()
+                    .getFragment(savedInstanceState, MENUFRAGMENT);
+        } else {
+            mMenuRecipeFragment = new MenuRecipesFragment();
 
-        //Create Intent
-        Intent intent = getIntent();
+            //Create Intent
+            Intent intent = getIntent();
 
-        //Getting values parsed by the main activity
-        if (intent != null){
-            if (intent.hasExtra("id")){
-                mId = intent.getIntExtra("id",1);
-                mName = intent.getStringExtra("name");
-                mImage = intent.getIntExtra("image", 0);
-                mServings = intent.getIntExtra("servings", 0);
-                isFav = intent.getBooleanExtra("isFav", false);
+            //Getting values parsed by the main activity
+            if (intent != null){
+                if (intent.hasExtra("id")){
+                    mId = intent.getIntExtra("id",1);
+                    mName = intent.getStringExtra("name");
+                    mImage = intent.getIntExtra("image", 0);
+                    mServings = intent.getIntExtra("servings", 0);
+                    isFav = intent.getBooleanExtra("isFav", false);
+
+                }
 
             }
 
+            actionBar.setTitle(mName);
+
+            if (findViewById(R.id.doublePane_menu) != null){
+
+                //This mean it is two pane
+                isTwoPane = true;
+
+                mStepToolbar = (Toolbar) findViewById(R.id.baking_toolbar);
+                mStepToolbar.setTitle(mName + " " + getString(R.string.step_toolbar_title));
+
+            } else {
+                isTwoPane = false;
+            }
+
+            mMenuRecipeFragment.setmRecipeId(mId);
+            mMenuRecipeFragment.setmRecipeName(mName);
+            mMenuRecipeFragment.setmImage(mImage);
+            mMenuRecipeFragment.setmServings(mServings);
+            mMenuRecipeFragment.setFav(isFav);
+            mMenuRecipeFragment.setmIsTwoPane(isTwoPane);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.menu_fragment, mMenuRecipeFragment)
+                    .commit();
         }
 
-        actionBar.setTitle(mName);
 
-        if (findViewById(R.id.doublePane_menu) != null){
+    }
 
-            //This mean it is two pane
-            isTwoPane = true;
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
 
-            mStepToolbar = (Toolbar) findViewById(R.id.baking_toolbar);
-            mStepToolbar.setTitle(mName + " " + getString(R.string.step_toolbar_title));
-
-        } else {
-            isTwoPane = false;
-        }
-
-        menuRecipesFragment.setmRecipeId(mId);
-        menuRecipesFragment.setmRecipeName(mName);
-        menuRecipesFragment.setmImage(mImage);
-        menuRecipesFragment.setmServings(mServings);
-        menuRecipesFragment.setFav(isFav);
-        menuRecipesFragment.setmIsTwoPane(isTwoPane);
-
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.menu_fragment, menuRecipesFragment)
-                .commit();
+        getSupportFragmentManager().putFragment(outState,MENUFRAGMENT , mMenuRecipeFragment);
 
     }
 }

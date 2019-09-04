@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -100,6 +101,20 @@ public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.M
         // Required empty public constructor
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if (savedInstanceState != null){
+            mRecipeName = savedInstanceState.getString(ARG_PARAM2);
+            mRecipeId = savedInstanceState.getInt(ARG_PARAM1);
+            mImage = savedInstanceState.getInt(IMAGE_KEY);
+            mServings = savedInstanceState.getInt(SERVING_KEY);
+            isFav = savedInstanceState.getBoolean(FAV_KEY);
+            mIsTwoPane = savedInstanceState.getBoolean(IS_TWO_PANE);
+        }
+    }
+
     /**
      * Inflate layout with data we get back from the async task
      * @param inflater
@@ -110,6 +125,8 @@ public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.M
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        setRetainInstance(true);
 
         if (savedInstanceState != null){
             mRecipeName = savedInstanceState.getString(ARG_PARAM2);
@@ -369,6 +386,8 @@ public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.M
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
         outState.putInt(ARG_PARAM1, mRecipeId);
         outState.putString(ARG_PARAM2, mRecipeName);
         outState.putInt(IMAGE_KEY, mImage);
@@ -376,7 +395,6 @@ public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.M
         outState.putBoolean(FAV_KEY, isFav);
         outState.putBoolean(IS_TWO_PANE, mIsTwoPane);
 
-        super.onSaveInstanceState(outState);
     }
 
     @Override
