@@ -24,7 +24,6 @@ import com.example.backingapp.Adapters.MenuRecipeAdapter;
 import com.example.backingapp.BakingActivity;
 import com.example.backingapp.Database.AppDatabase;
 import com.example.backingapp.Database.AppExecutors;
-import com.example.backingapp.ImageIdGenerator;
 import com.example.backingapp.JsonUtils.NetworkUtils;
 import com.example.backingapp.Model.MenuRecipes;
 import com.example.backingapp.Model.Recipe;
@@ -296,7 +295,7 @@ public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.M
                         .commit();
 
                 mFramelayout2.setVisibility(View.VISIBLE);
-                mStepFragment.setmStepDescription(description);
+                mStepFragment.setmDescription(description);
                 getFragmentManager().beginTransaction()
                         .replace(R.id.frameLayout2, mStepFragment)
                         .commit();
@@ -313,7 +312,7 @@ public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.M
                         .into(mImageView);
 
                 mFramelayout2.setVisibility(View.VISIBLE);
-                mStepFragment.setmStepDescription(description);
+                mStepFragment.setmDescription(description);
                 getFragmentManager().beginTransaction()
                         .replace(R.id.frameLayout2, mStepFragment)
                         .commit();
@@ -330,7 +329,7 @@ public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.M
                         .into(mImageView);
 
                 mFramelayout2.setVisibility(View.VISIBLE);
-                mStepFragment.setmStepDescription(description);
+                mStepFragment.setmDescription(description);
                 getFragmentManager().beginTransaction()
                         .replace(R.id.frameLayout2, mStepFragment)
                         .commit();

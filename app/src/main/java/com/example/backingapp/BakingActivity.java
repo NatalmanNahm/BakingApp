@@ -40,6 +40,7 @@ public class BakingActivity extends AppCompatActivity{
 
     private FrameLayout mFramelayou1;
     private FrameLayout mFramelayout2;
+    private FrameLayout mFrameLayoutIngredient;
     private ImageView mImageView;
 
     private IngredientFragment mIngredientFragment;
@@ -65,30 +66,27 @@ public class BakingActivity extends AppCompatActivity{
         nextButton = (FloatingActionButton) findViewById(R.id.nextButton);
         mFramelayou1 = (FrameLayout) findViewById(R.id.frameLayout1);
         mFramelayout2 = (FrameLayout) findViewById(R.id.frameLayout2);
+        mFrameLayoutIngredient = (FrameLayout) findViewById(R.id.frameLayout_Ingredient);
         mImageView = (ImageView) findViewById(R.id.justThumb);
 
-        //Get an instance of the Fragment needed
 
+        //If nothing is in the saveInstance bundle then create a new instance of the fragments
+        //else just use the saveed ones.
+        if (savedInstanceState == null ){
+            mStepFragment = new StepFragment();
+            mVideoFragment = new VideoFragment();
+            mIngredientFragment = new IngredientFragment();
+        } else {
+            mStepFragment = (StepFragment) getSupportFragmentManager()
+                    .getFragment(savedInstanceState, STEP_FRAGMENT);
 
-//        if (savedInstanceState != null && mIngredientFragment == null) {
-//            mIngredientFragment = (IngredientFragment) getSupportFragmentManager()
-//                    .getFragment(savedInstanceState, INGREDIENT_FRAG);
-//        } else {
-//            mIngredientFragment = new IngredientFragment();
-//        }
+            mIngredientFragment = (IngredientFragment) getSupportFragmentManager()
+                    .getFragment(savedInstanceState, INGREDIENT_FRAG);
 
-//        if (savedInstanceState != null && mStepFragment == null && mVideoFragment == null){
-//            mStepFragment = (StepFragment) getSupportFragmentManager()
-//                    .getFragment(savedInstanceState, STEP_FRAGMENT);
-//            mVideoFragment = (VideoFragment) getSupportFragmentManager()
-//                    .getFragment(savedInstanceState, VIDEO_FRAG);
-//        } else {
-//
-//        }
-
-        mStepFragment = new StepFragment();
-        mVideoFragment = new VideoFragment();
-        mIngredientFragment = new IngredientFragment();
+            mVideoFragment = (VideoFragment) getSupportFragmentManager()
+                    .getFragment(savedInstanceState, VIDEO_FRAG);
+            mId = savedInstanceState.getInt("StepId", 1);
+        }
 
 
         //Create Intent
@@ -100,19 +98,20 @@ public class BakingActivity extends AppCompatActivity{
 
                 mRecipeId = intent.getIntExtra("id", 1);
                 mRecipeName = intent.getStringExtra("RecipeName");
-
-                mIngredientFragment.setmRecipeId(mRecipeId);
+                mVideoLink = "";
 
                 mToolbar.setVisibility(View.VISIBLE);
+                mFrameLayoutIngredient.setVisibility(View.VISIBLE);
                 mImageView.setVisibility(View.GONE);
                 actionBar.setTitle(mRecipeName + " " + getString(R.string.ingredients_button_text));
                 mRelativeLayout.setVisibility(View.GONE);
-                mFramelayou1.setVisibility(View.VISIBLE);
+                mFramelayou1.setVisibility(View.GONE);
                 mFramelayout2.setVisibility(View.GONE);
 
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.frameLayout1, mIngredientFragment)
-                        .commit();
+                startIngredientFragment(mIngredientFragment, mRecipeId);
+                startDescFragment(mStepFragment, mDescription);
+                startVideoFragment(mVideoFragment, mVideoLink);
+
 
             } else if (intent.hasExtra("desc")){
 
@@ -139,11 +138,11 @@ public class BakingActivity extends AppCompatActivity{
 
                 //Landscape setting
                 if (findViewById(R.id.landscape) != null){
-                    displayOnLandscape(mStepFragment, mVideoFragment);
+                    displayOnLandscape(mStepFragment, mVideoFragment, mIngredientFragment);
                 }
                 //Portrait Setting
                 else {
-                    displayOnPotrait(mStepFragment, mVideoFragment);
+                    displayOnPotrait(mStepFragment, mVideoFragment, mIngredientFragment);
                 }
 
                 hideNextButton(mId);
@@ -180,15 +179,17 @@ public class BakingActivity extends AppCompatActivity{
             }
         }
 
-        //Landscape setting
-        if (findViewById(R.id.landscape) != null){
-            displayOnLandscape(mStepFragment, mVideoFragment);
+//        //Landscape setting
+//        if (findViewById(R.id.landscape) != null){
+//            displayOnLandscape(mStepFragment, mVideoFragment, mIngredientFragment);
+//
+//        }
+//        //Portrait Setting
+//        else {
+//            displayOnPotrait(mStepFragment, mVideoFragment, mIngredientFragment);
+//        }
 
-        }
-        //Portrait Setting
-        else {
-           displayOnPotrait(mStepFragment, mVideoFragment);
-        }
+        displayOnPotrait(mStepFragment, mVideoFragment, mIngredientFragment);
 
         hideNextButton(mId);
         hidePreviousButton(mId);
@@ -226,12 +227,12 @@ public class BakingActivity extends AppCompatActivity{
 
         //Landscape setting
         if (findViewById(R.id.landscape) != null){
-            displayOnLandscape(mStepFragment, mVideoFragment);
+            displayOnLandscape(mStepFragment, mVideoFragment, mIngredientFragment);
 
         }
         //Portrait Setting
         else {
-            displayOnPotrait(mStepFragment, mVideoFragment);
+            displayOnPotrait(mStepFragment, mVideoFragment, mIngredientFragment);
         }
 
         hideNextButton(mId);
@@ -256,9 +257,21 @@ public class BakingActivity extends AppCompatActivity{
      * @param description
      */
     private void startDescFragment(StepFragment stepFragment, String description){
-        stepFragment.setmStepDescription(description);
+        stepFragment.setmDescription(description);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.frameLayout2, stepFragment)
+                .commit();
+    }
+
+    /**
+     * helper method to inflate Ingredient Fragment with its data
+     * @param ingredientFragment
+     * @param id
+     */
+    private void startIngredientFragment(IngredientFragment ingredientFragment, int id){
+        ingredientFragment.setmRecipeId(id);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frameLayout_Ingredient, ingredientFragment)
                 .commit();
     }
 
@@ -293,24 +306,28 @@ public class BakingActivity extends AppCompatActivity{
      * @param stepFragment
      * @param videoFragment
      */
-    private void displayOnLandscape(StepFragment stepFragment, VideoFragment videoFragment){
+    private void displayOnLandscape(StepFragment stepFragment, VideoFragment videoFragment, IngredientFragment ingredientFragment){
         //Hide toolbar
         mToolbar.setVisibility(View.GONE);
         //hide the Next and Previous Button too
+        startIngredientFragment(ingredientFragment, mRecipeId);
+        mFrameLayoutIngredient.setVisibility(View.GONE);
         mRelativeLayout.setVisibility(View.GONE);
         mImageView.setVisibility(View.GONE);
+
+        //Start Fragments
+        startDescFragment(stepFragment, mDescription);
+        startVideoFragment(videoFragment, mVideoLink);
         //change to next Video if there is one
         if (mVideoLink != null && !mVideoLink.isEmpty()){
             mFramelayou1.setVisibility(View.VISIBLE);
-            startVideoFragment(videoFragment, mVideoLink);
             mFramelayout2.setVisibility(View.GONE);
 
         } else {
             mFramelayout2.setVisibility(View.VISIBLE);
             mFramelayou1.setVisibility(View.GONE);
-            //change to next description
-            startDescFragment(stepFragment, mDescription);
         }
+        Log.d("DESC", mDescription);
     }
 
     /**
@@ -318,16 +335,20 @@ public class BakingActivity extends AppCompatActivity{
      * @param stepFragment
      * @param videoFragment
      */
-    private void displayOnPotrait(StepFragment stepFragment, VideoFragment videoFragment){
+    private void displayOnPotrait(StepFragment stepFragment, VideoFragment videoFragment, IngredientFragment ingredientFragment){
         //Showing Toolbar
         mToolbar.setVisibility(View.VISIBLE);
         //Show the nex and previous button
         mRelativeLayout.setVisibility(View.VISIBLE);
+        startIngredientFragment(ingredientFragment, mRecipeId);
+        mFrameLayoutIngredient.setVisibility(View.GONE);
+        //Start Video Fragment
+        startVideoFragment(videoFragment, mVideoLink);
+
         //change to next Video if there is one
         if (mVideoLink != null && !mVideoLink.isEmpty()) {
             mFramelayou1.setVisibility(View.VISIBLE);
             mImageView.setVisibility(View.GONE);
-            startVideoFragment(videoFragment, mVideoLink);
 
         } else if(mThumbnail != null && !mThumbnail.isEmpty()){
             mFramelayou1.setVisibility(View.GONE);
@@ -350,6 +371,7 @@ public class BakingActivity extends AppCompatActivity{
         mFramelayout2.setVisibility(View.VISIBLE);
         //change to next description
         startDescFragment(stepFragment, mDescription);
+        Log.d("DESC", mDescription);
     }
 
 
@@ -374,21 +396,10 @@ public class BakingActivity extends AppCompatActivity{
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-//        if (mVideoFragment.isAdded()){
-//            getSupportFragmentManager().putFragment(outState, VIDEO_FRAG, mVideoFragment);
-//        }
-
-//        if (mIngredientFragment.isAdded()){
-//            getSupportFragmentManager().putFragment(outState, INGREDIENT_FRAG, mIngredientFragment);
-//        }
-
-//        if (mStepFragment.isAdded()){
-//            getSupportFragmentManager().putFragment(outState, STEP_FRAGMENT, mStepFragment);
-//        }
-
-//        getSupportFragmentManager().putFragment(outState, INGREDIENT_FRAG, mIngredientFragment);
-//        getSupportFragmentManager().putFragment(outState, STEP_FRAGMENT, mStepFragment);
-//        getSupportFragmentManager().putFragment(outState, VIDEO_FRAG, mVideoFragment);
+        getSupportFragmentManager().putFragment(outState, INGREDIENT_FRAG, mIngredientFragment);
+        getSupportFragmentManager().putFragment(outState, STEP_FRAGMENT, mStepFragment);
+        getSupportFragmentManager().putFragment(outState, VIDEO_FRAG, mVideoFragment);
+        outState.putInt("StepId", mId);
 
     }
 }

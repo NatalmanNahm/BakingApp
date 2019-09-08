@@ -46,6 +46,9 @@ public class IngredientFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        setRetainInstance(true);
+
         if (savedInstanceState != null){
             mRecipeId = savedInstanceState.getInt(ARG_PARAM1);
         }

@@ -1,7 +1,5 @@
 package com.example.backingapp.Fragments;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -18,8 +16,8 @@ import com.example.backingapp.R;
 public class StepFragment extends Fragment {
     // the fragment initialization parameters
     private static final String ARG_PARAM1 = "param1";
-    private String mStepDescription;
-    private TextView mDescription;
+    private String mDescription;
+    private TextView mDescriptionView;
 
 
 
@@ -32,25 +30,29 @@ public class StepFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        setRetainInstance(true);
+
         if (savedInstanceState != null){
-            mStepDescription = savedInstanceState.getString(ARG_PARAM1);
+            mDescription = savedInstanceState.getString(ARG_PARAM1);
         }
         // Inflate the layout for this fragment
         View rootView =  inflater.inflate(R.layout.fragment_step, container, false);
 
-        mDescription = (TextView) rootView.findViewById(R.id.step_info);
-        mDescription.setText(mStepDescription);
+        mDescriptionView = (TextView) rootView.findViewById(R.id.step_info);
+        mDescriptionView.setText(mDescription);
+
 
         return rootView;
     }
 
-    public void setmStepDescription(String mStepDescription) {
-        this.mStepDescription = mStepDescription;
+    public void setmDescription(String mDescription) {
+        this.mDescription = mDescription;
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putString(mStepDescription, ARG_PARAM1);
+
         super.onSaveInstanceState(outState);
+        outState.putString(ARG_PARAM1, mDescription);
     }
 }
