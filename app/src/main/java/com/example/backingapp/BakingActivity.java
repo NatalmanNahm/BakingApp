@@ -85,7 +85,6 @@ public class BakingActivity extends AppCompatActivity{
 
             mVideoFragment = (VideoFragment) getSupportFragmentManager()
                     .getFragment(savedInstanceState, VIDEO_FRAG);
-            mId = savedInstanceState.getInt("StepId", 1);
         }
 
 
@@ -117,11 +116,17 @@ public class BakingActivity extends AppCompatActivity{
 
                 //Getting data parse to the activity
                 mRecipeName = intent.getStringExtra("RecipeName");
-                mId = intent.getIntExtra("StepId", 0);
+
+                if(savedInstanceState != null){
+                    mId = savedInstanceState.getInt("StepId");
+                    mVideoLink = savedInstanceState.getString("video");
+                } else {
+                    mId = intent.getIntExtra("StepId", 0);
+                    mVideoLink = intent.getStringExtra("video");
+                }
                 mRecipeId = intent.getIntExtra("idRecipe", 1);
                 mImage = ImageIdGenerator.imageId(mRecipeId);
                 mDescription = intent.getStringExtra("desc");
-                mVideoLink = intent.getStringExtra("video");
                 mThumbnail = intent.getStringExtra("thumbnail");
 
                 mIdArray = intent.getIntArrayExtra("idArray");
@@ -179,16 +184,6 @@ public class BakingActivity extends AppCompatActivity{
             }
         }
 
-//        //Landscape setting
-//        if (findViewById(R.id.landscape) != null){
-//            displayOnLandscape(mStepFragment, mVideoFragment, mIngredientFragment);
-//
-//        }
-//        //Portrait Setting
-//        else {
-//            displayOnPotrait(mStepFragment, mVideoFragment, mIngredientFragment);
-//        }
-
         displayOnPotrait(mStepFragment, mVideoFragment, mIngredientFragment);
 
         hideNextButton(mId);
@@ -225,15 +220,7 @@ public class BakingActivity extends AppCompatActivity{
             }
         }
 
-        //Landscape setting
-        if (findViewById(R.id.landscape) != null){
-            displayOnLandscape(mStepFragment, mVideoFragment, mIngredientFragment);
-
-        }
-        //Portrait Setting
-        else {
-            displayOnPotrait(mStepFragment, mVideoFragment, mIngredientFragment);
-        }
+        displayOnPotrait(mStepFragment, mVideoFragment, mIngredientFragment);
 
         hideNextButton(mId);
         hidePreviousButton(mId);
@@ -400,6 +387,6 @@ public class BakingActivity extends AppCompatActivity{
         getSupportFragmentManager().putFragment(outState, STEP_FRAGMENT, mStepFragment);
         getSupportFragmentManager().putFragment(outState, VIDEO_FRAG, mVideoFragment);
         outState.putInt("StepId", mId);
-
+        outState.putString("video", mVideoLink);
     }
 }
