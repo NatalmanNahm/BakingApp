@@ -77,17 +77,6 @@
 
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/fav_image"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginLeft="85dp"
-            android:layout_marginTop="8dp"
-            android:src="@drawable/ic_favorite_black_24dp"
-            android:background="@color/color_white"
-            android:visibility="gone"
-            />
-
     </LinearLayout>
 
 </LinearLayout>

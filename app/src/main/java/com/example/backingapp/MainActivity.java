@@ -17,7 +17,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.View;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -49,12 +49,6 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
     private TextView mErrorMessage;
     private ProgressBar mLoading;
     private Toolbar mMainToolBar;
-
-    private boolean isFav;
-    private int mId;
-    private String mName;
-    private int mImage;
-    private int mServings;
     private AppDatabase mDb;
 
     private MainViewModel mViewModel;
@@ -91,8 +85,6 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
         //creating a progress bar that let the user know that there data is been loaded
         mLoading = (ProgressBar) findViewById(R.id.loading_circle);
 
-        //Getting reference to the ImageButton
-
         //Creating gridView where we add the recipes
         if (findViewById(R.id.main_sw600) != null){
             mGridLayoutManager =
@@ -106,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
         //Initialize member variable for the data base
         mDb = AppDatabase.getInstance(getApplicationContext());
         mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+
 
         //Set GridView to the Reyclerview
         mRecyclerView.setLayoutManager(mGridLayoutManager);
@@ -121,6 +114,29 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
             mGridLayoutManager.onRestoreInstanceState(mSavedGridLayoutManager);
         }
 
+//        for (int i =0; i<mRecipes.size(); i++){
+//            Recipe recipe = mRecipes.get(i);
+//            int id = recipe.getId();
+//            //Getting reference to the ImageView
+//            mFavImage = (ImageView) findViewById(R.id.fav_image);
+//            AppExecutors.getInstance().diskIO().execute(new Runnable() {
+//                @Override
+//                public void run() {
+//                    int mSavedId = mDb.recipesDao().idSaved(id);
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//
+//                            if (id == mSavedId){
+//                                mFavImage.setVisibility(View.VISIBLE);
+//                            }
+//                        }
+//                    });
+//                }
+//            });
+//
+//        }
+
         loadRecipeData();
 
     }
@@ -133,6 +149,29 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
         setUpViewModel();
         showRecipeDataView();
         new Fetchrecipes().execute();
+
+//        for (int i =0; i<mRecipes.size(); i++){
+//            Recipe recipe = mRecipes.get(i);
+//            int id = recipe.getId();
+//            //Getting reference to the ImageView
+//            mFavImage = (ImageView) findViewById(R.id.fav_image);
+//            AppExecutors.getInstance().diskIO().execute(new Runnable() {
+//                @Override
+//                public void run() {
+//                    int mSavedId = mDb.recipesDao().idSaved(id);
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//
+//                            if (id == mSavedId){
+//                                mFavImage.setVisibility(View.VISIBLE);
+//                            }
+//                        }
+//                    });
+//                }
+//            });
+//
+//        }
 
     }
 
@@ -181,6 +220,7 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
             if (recipes != null && !recipes.isEmpty()){
                 //Displaying the Recipe Card
                 showRecipeDataView();
+
                 mRecipeAdapter.setRecipeData(recipes);
                 mGridLayoutManager.onRestoreInstanceState(mSavedGridLayoutManager);
             }else {

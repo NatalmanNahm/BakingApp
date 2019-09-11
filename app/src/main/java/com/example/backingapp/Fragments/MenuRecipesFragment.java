@@ -420,7 +420,6 @@ public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.M
                             } else if (savedId == mRecipeId){
                                 item.setIcon(R.drawable.ic_favorite_border_black_24dp);
                                 mDb.recipesDao().deletefavRecipe(savedRecipe);
-//                                getActivity().finish();
                             }else {
                                 item.setIcon(R.drawable.ic_favorite_black_24dp);
                                 mDb.recipesDao().addFavRecipe(recipe);
@@ -436,7 +435,6 @@ public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.M
                         public void run() {
                             Recipe savedRecipe = mDb.recipesDao().toBeDelete(mRecipeId);
                             mDb.recipesDao().deletefavRecipe(savedRecipe);
-//                            getActivity().finish();
                         }
                     });
 
