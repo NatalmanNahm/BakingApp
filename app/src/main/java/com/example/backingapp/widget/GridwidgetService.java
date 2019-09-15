@@ -72,7 +72,7 @@ class GridRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory{
         extras.putString("RecipeName", name);
         Intent fillInIntent = new Intent();
         fillInIntent.putExtras(extras);
-        views.setOnClickFillInIntent(R.id.widget_icon, fillInIntent);
+        views.setOnClickFillInIntent(R.id.cake_widget, fillInIntent);
 
         return views;
 

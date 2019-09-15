@@ -28,6 +28,7 @@ import com.example.backingapp.JsonUtils.NetworkUtils;
 import com.example.backingapp.Model.MenuRecipes;
 import com.example.backingapp.Model.Recipe;
 import com.example.backingapp.R;
+import com.example.backingapp.widget.UpdateWidget;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -417,12 +418,15 @@ public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.M
                             if (savedId == 0){
                                 item.setIcon(R.drawable.ic_favorite_black_24dp);
                                 mDb.recipesDao().addFavRecipe(recipe);
+                                UpdateWidget.startActionUpdateWidgets(getContext());
                             } else if (savedId == mRecipeId){
                                 item.setIcon(R.drawable.ic_favorite_border_black_24dp);
                                 mDb.recipesDao().deletefavRecipe(savedRecipe);
+                                UpdateWidget.startActionUpdateWidgets(getContext());
                             }else {
                                 item.setIcon(R.drawable.ic_favorite_black_24dp);
                                 mDb.recipesDao().addFavRecipe(recipe);
+                                UpdateWidget.startActionUpdateWidgets(getContext());
                             }
                         }
                     });
@@ -435,6 +439,7 @@ public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.M
                         public void run() {
                             Recipe savedRecipe = mDb.recipesDao().toBeDelete(mRecipeId);
                             mDb.recipesDao().deletefavRecipe(savedRecipe);
+                            UpdateWidget.startActionUpdateWidgets(getContext());
                         }
                     });
 

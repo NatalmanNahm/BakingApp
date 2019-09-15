@@ -87,7 +87,6 @@ public class VideoFragment extends Fragment implements Player.EventListener {
             mPlayerView.setPlayer(mExoPlayer);
 
             mExoPlayer.setPlayWhenReady(playWhenReady);
-            Log.d("POSITION1", Long.toString(playbackPosition) + "i");
             mExoPlayer.seekTo(currentWindow, playbackPosition);
 
             Uri uri = Uri.parse(mVideoLink);
@@ -138,30 +137,18 @@ public class VideoFragment extends Fragment implements Player.EventListener {
     @Override
     public void onPause() {
         super.onPause();
-        if (mExoPlayer != null) {
+
+        if (Util.SDK_INT <= 23 && mExoPlayer != null) {
             releasePlayer();
         }
     }
 
     @Override
     public void onStop() {
-        if (mExoPlayer != null) {
-            releasePlayer();
-        }
         super.onStop();
-    }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (mExoPlayer != null) {
-            releasePlayer();
-        }
-    }
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (mExoPlayer != null){
+        super.onStop();
+        if (Util.SDK_INT > 23 && mExoPlayer != null) {
             releasePlayer();
         }
     }
@@ -169,17 +156,23 @@ public class VideoFragment extends Fragment implements Player.EventListener {
     @Override
     public void onStart() {
         super.onStart();
-        Log.d("POSITION1", Long.toString(playbackPosition) + "s");
-        initializePlayer();
-        initMediaSession();
+
+        if (Util.SDK_INT > 23) {
+            initializePlayer();
+            initMediaSession();
+        }
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("POSITION1", Long.toString(playbackPosition) + "r");
-        initializePlayer();
-        initMediaSession();
+
+        if ((Util.SDK_INT <= 23 || mExoPlayer == null)) {
+            initializePlayer();
+            initMediaSession();
+        }
+
     }
 
     private void releasePlayer() {
@@ -197,10 +190,8 @@ public class VideoFragment extends Fragment implements Player.EventListener {
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
         if ((playbackState == Player.STATE_READY) && playWhenReady) {
             mStateBuilder.setState(PlaybackStateCompat.STATE_PLAYING, playbackPosition, 1f);
-//            Log.d("POSITION1", Long.toString(playbackPosition));
         } else if ((playbackState == Player.STATE_READY)){
             mStateBuilder.setState(PlaybackStateCompat.STATE_PAUSED, playbackPosition, 1f);
-//            Log.d("POSITION1", Long.toString(playbackPosition));
 
         }
 

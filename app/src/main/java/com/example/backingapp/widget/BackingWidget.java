@@ -1,5 +1,6 @@
 package com.example.backingapp.widget;
 
+import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -9,6 +10,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.annotation.RequiresApi;
 import android.widget.RemoteViews;
 
@@ -19,6 +21,7 @@ import com.example.backingapp.Model.Recipe;
 import com.example.backingapp.R;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -26,47 +29,26 @@ import java.util.List;
  */
 public class BackingWidget extends AppWidgetProvider {
 
-    private static List<Recipe> recipe = new ArrayList<>();
-    private static AppDatabase mDb;
-
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
-//        mDb = AppDatabase.getInstance(context);
-//
-//        new FetchDataFromDatabase().execute();
 
         RemoteViews  views = getGridIndredientRemoteView(context);
-//        //look in the database to see if there is data
-//        //if there is no data then open MainActivity
-//        if (recipe == null){
-//            views = getCakeRecipesRemoteView(context);
-//        } else { // if there is then open the Ingredient
-//            views = getGridIndredientRemoteView(context);
-//        }
-
-
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-    @Override
-    public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        // There may be multiple widgets active, so update all of them
-        for (int appWidgetId : appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId);
+    public static void updateRecipeWidget(Context context, AppWidgetManager appWidgetManager,
+                                          int [] appWidgets){
+        for (int appWidget : appWidgets){
+            updateAppWidget(context, appWidgetManager, appWidget);
         }
     }
 
     @Override
-    public void onEnabled(Context context) {
-        // Enter relevant functionality for when the first widget is created
-    }
-
-    @Override
-    public void onDisabled(Context context) {
-        // Enter relevant functionality for when the last widget is disabled
+    public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+        // There may be multiple widgets active, so update all of them
+        UpdateWidget.startActionUpdateWidgets(context);
     }
 
     private static RemoteViews getGridIndredientRemoteView(Context context){
@@ -84,34 +66,22 @@ public class BackingWidget extends AppWidgetProvider {
         return views;
     }
 
-    private  static  RemoteViews getCakeRecipesRemoteView(Context context){
-
-        Intent intent = new Intent(context, MainActivity.class);
-
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        // Construct the RemoteViews object
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.backing_widget);
-        // Widgets allow click handlers to only launch pending intents
-        views.setOnClickPendingIntent(R.id.widget_icon, pendingIntent);
-
-        return views;
+    @Override
+    public void onEnabled(Context context) {
+        // Enter relevant functionality for when the first widget is created
     }
 
-    public static class FetchDataFromDatabase extends AsyncTask<Context, Void, List<Recipe>>{
-
-        @Override
-        protected List<Recipe> doInBackground(Context... contexts) {
-            recipe = null;
-
-            recipe = mDb.recipesDao().GetAllFavRecipe();
-            return recipe;
-        }
-
-        @Override
-        protected void onPostExecute(List<Recipe> recipes) {
-            super.onPostExecute(recipes);
-        }
+    @Override
+    public void onDisabled(Context context) {
+        // Enter relevant functionality for when the last widget is disabled
     }
 
+    @Override
+    public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Bundle newOptions) {
+
+        UpdateWidget.startActionUpdateWidgets(context);
+
+        super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions);
+    }
 }
 
