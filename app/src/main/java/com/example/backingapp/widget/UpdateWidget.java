@@ -15,6 +15,11 @@ import android.widget.RemoteViews;
 import com.example.backingapp.BakingActivity;
 import com.example.backingapp.R;
 
+
+/**
+ * Service class to take care of the updating od the
+ * widget whenever data changes
+ */
 public class UpdateWidget extends IntentService {
 
 
@@ -39,6 +44,10 @@ public class UpdateWidget extends IntentService {
         }
     }
 
+    /**
+     * refresh widget to get the last update
+     * @param context
+     */
     public static void startActionUpdateWidgets(Context context){
         Intent intent = new Intent(context, UpdateWidget.class);
         intent.setAction(ACTION_UPDATE_WIDGET);
@@ -46,6 +55,9 @@ public class UpdateWidget extends IntentService {
     }
 
 
+    /**
+     * handle teh updating of widget
+     */
     private void handleActionUpdateCakeWidget(){
 
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);

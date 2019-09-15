@@ -418,14 +418,17 @@ public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.M
                             if (savedId == 0){
                                 item.setIcon(R.drawable.ic_favorite_black_24dp);
                                 mDb.recipesDao().addFavRecipe(recipe);
+                                //refresh widget because data changes
                                 UpdateWidget.startActionUpdateWidgets(getContext());
                             } else if (savedId == mRecipeId){
                                 item.setIcon(R.drawable.ic_favorite_border_black_24dp);
                                 mDb.recipesDao().deletefavRecipe(savedRecipe);
+                                //refresh widget because data changes
                                 UpdateWidget.startActionUpdateWidgets(getContext());
                             }else {
                                 item.setIcon(R.drawable.ic_favorite_black_24dp);
                                 mDb.recipesDao().addFavRecipe(recipe);
+                                //refresh widget because data changes
                                 UpdateWidget.startActionUpdateWidgets(getContext());
                             }
                         }
@@ -439,6 +442,7 @@ public class MenuRecipesFragment extends Fragment implements MenuRecipeAdapter.M
                         public void run() {
                             Recipe savedRecipe = mDb.recipesDao().toBeDelete(mRecipeId);
                             mDb.recipesDao().deletefavRecipe(savedRecipe);
+                            //refresh widget because data changes
                             UpdateWidget.startActionUpdateWidgets(getContext());
                         }
                     });

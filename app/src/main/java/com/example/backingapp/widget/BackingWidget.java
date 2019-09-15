@@ -51,16 +51,24 @@ public class BackingWidget extends AppWidgetProvider {
         UpdateWidget.startActionUpdateWidgets(context);
     }
 
+    /**
+     * Create and return the remoteView to be displayed in the GridView
+     * @param context
+     * @return
+     */
     private static RemoteViews getGridIndredientRemoteView(Context context){
 
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_grid_view);
+        // Set the GridWidgetService intent to act as the adapter for the GridView
         Intent intent = new Intent(context, GridwidgetService.class);
         views.setRemoteAdapter(R.id.widget_grid_view, intent);
 
+        //Launch the BackingActivity when the widget is clicked
         Intent appIntent = new Intent(context, BakingActivity.class);
         PendingIntent appPendingIntent = PendingIntent.getActivity(context, 0, appIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         views.setPendingIntentTemplate(R.id.widget_grid_view, appPendingIntent);
 
+        //Show this when there is no saved recipe
         views.setEmptyView(R.id.widget_grid_view, R.id.empty_view);
 
         return views;
